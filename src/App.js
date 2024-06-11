@@ -1,24 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Calendar from './Calender'; // カレンダーコンポーネントをインポート
+import Login from './Login';
+import { UserProvider } from './context/UseContext'; // インポートパスを修正
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserProvider> {/* UserProvider で全体をラップ */}
+      <Router>
+        <div className="w-full h-screen bg-white"> {/* アプリケーション全体の背景を白に設定 */}
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/home" element={<Calendar />} /> {/* カレンダーコンポーネントを直接表示 */}
+            <Route path="/" element={<Navigate to="/login" />} /> {/* 最初にログイン画面にリダイレクト */}
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
