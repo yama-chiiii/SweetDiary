@@ -2,7 +2,7 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase-config';
-import logo from './logo.png'; // 画像ファイルをインポート
+import logo from './image/logo.png'; // 画像ファイルをインポート
 
 const Login = () => {
     const navigate = useNavigate();

@@ -4,7 +4,11 @@ import 'moment/locale/ja'; // 日本語のロケールをインポート
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from './context/UseContext'; // インポートパスを修正
-import memoImage from './memo.png'; // 画像ファイルをインポート
+import ameImg from './image/ame.png';
+import cakeDrinkImg from './image/cake&drink.png';
+import cakeImg from './image/cake.png';
+import candyImg from './image/candy.png';
+
 
 moment.locale('ja'); // momentのロケールを日本語に設定
 
@@ -66,16 +70,34 @@ const Calendar = () => {
 
     return (
         <div className="flex w-full min-h-screen bg-white">
-            <div className="w-1/4 min-h-full flex flex-col items-center justify-between bg-pink-100">
-                <div className='flex flex-col items-center '>
-                    <h1 className="text-2xl font-bold mt-6 ">おかしにっき</h1>
-                    <p className="text-xl mt-2">やっほ〜 {user ? user.displayName : 'ゲスト'}～！</p>
+            <div className="w-1/4 min-h-full flex flex-col items-center bg-pink-100 relative justify-between">
+                <div className='w-full'>
+                    <div className='flex flex-col items-center mb-4 text-pink-400'>
+                        <h1 className="text-4xl font-bold mt-8">おかしにっき</h1>
+                        <p className="text-2xl mt-8">やっほ〜 {user ? user.displayName : 'ゲスト'}～！</p>
+                    </div>
+                    <div className='flex flex-row-reverse items-end'>
+                        <img src={candyImg} alt="Candy" style={{ width: "100px", position: "relative", bottom: "-80px" }} />
+                    </div>
+                    <div className="flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
+                        <p className="text-3xl mb-12">もくひょう！</p>
+                        <p className="text-2xl">かかく</p>
+                        <input className="bg-transparent outline-none border-none w-full text-lg ml-8 mb-4" placeholder="3000円/10000円" />
+                        <p className="text-2xl">かろりー</p>
+                        <input className="bg-transparent outline-none border-none w-full text-lg ml-8 mb-6" placeholder="3000kcal/10000kcal" />
+                    </div>
+                    <div className='flex flex-row justify-between'>
+                        <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
+                        <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
+                    </div>
                 </div>
-                <img src={memoImage} alt="Memo" className="w-64 h-64" style={{ width: '540px', height: '440px' }} />
-                <div>
-                    <button onClick={handleLogout} className="bg-pink-300 text-white rounded px-4 py-2 mb-4">ろぐあうと</button>
+                <div className='flex flex-row justify-around  w-full'>
+                    <div className='flex flex-col-reverse'>
+                        <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4">ろぐあうと</button>
+                    </div>
+                    <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4" style={{ width: "200px" }} />
                 </div>
-            </div >
+            </div>
             <div className="flex flex-col items-center flex-grow p-8 min-h-full">
                 <div className="flex justify-between items-center w-full mb-16">
                     <button onClick={previousMonth} className="text-xl font-semibold">⇐ まえ</button>
@@ -119,7 +141,7 @@ const Calendar = () => {
                     ))}
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
