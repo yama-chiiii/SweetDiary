@@ -47,6 +47,11 @@ const Calendar = () => {
             });
     };
 
+    const handleDateClick = (day) => {
+        // CandyDetailsForm に遷移し、日付をパラメータとして渡す
+        navigate('/details', { state: { date: day.format('YYYY-MM-DD') } });
+    };
+
     const today = moment().format('D');
 
     // 日曜日から始まるカレンダーを作成するための配列生成
@@ -121,15 +126,15 @@ const Calendar = () => {
                                 const date = day.date();
                                 const isCurrentMonth = day.isSame(currentMonth, 'month');
                                 const isToday = date === parseInt(today, 10) && day.isSame(moment(), 'day');
-                                const dayOfWeek = day.day();
 
                                 return (
-                                    <div key={day.format('YYYY-MM-DD')} className="flex flex-col items-center justify-center">
+                                    <div key={day.format('YYYY-MM-DD')} className="flex flex-col items-center justify-center"
+                                        onClick={() => handleDateClick(day)}>
                                         {isCurrentMonth && (
                                             <>
-                                                <div className={`w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center mb-2 ${isToday ? 'text-pink-500' : dayOfWeek === 0 ? 'text-red-500' : dayOfWeek === 6 ? 'text-blue-500' : 'text-black'}`}>
+                                                <div className={`w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center mb-2 ${isToday ? 'text-pink-500' : 'text-black'}`}>
                                                 </div>
-                                                <span className={`text-lg ${isToday ? 'text-pink-500' : dayOfWeek === 0 ? 'text-red-500' : dayOfWeek === 6 ? 'text-blue-500' : 'text-black'}`}>
+                                                <span className={`text-lg ${isToday ? 'text-pink-500' : 'text-black'}`}>
                                                     {date.toString().padStart(2, '0')}
                                                 </span>
                                             </>

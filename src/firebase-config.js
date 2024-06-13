@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import 'firebase/auth'; // 認証機能を使用する場合
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore'; // Firestore用のインポートを追加
 
 const firebaseConfig = {
     apiKey: "AIzaSyD8Xzt4Xesf2KT5jYMp-8wPzvo3nJPRzKU",
@@ -14,3 +14,4 @@ const firebaseConfig = {
 // Firebaseを初期化
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);  // Firestoreを初期化してエクスポート
