@@ -1,10 +1,12 @@
 import { getAuth, signOut } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import moment from 'moment';
 import 'moment/locale/ja'; // 日本語のロケールをインポート
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useIcons } from './context/IconContext';
 import UserContext from './context/UseContext'; // インポートパスを修正
+import { db } from './firebase-config'; // Firebaseのインポート
 import ameImg from './image/ame.png';
 import cakeDrinkImg from './image/cake&drink.png';
 import cakeImg from './image/cake.png';
@@ -24,6 +26,27 @@ const Calendar = () => {
     const auth = getAuth();
     const navigate = useNavigate();
     const { icons } = useIcons();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state) {
+            const { date, formData, selectedIcon } = location.state;
+            if (selectedIcon !== undefined) {
+                const saveData = async (date, formData, selectedIcon) => {
+                    const user = auth.currentUser;
+                    if (user) {
+                        const docRef = doc(db, "users", user.uid, "details", date);
+                        await setDoc(docRef, {
+                            ...formData,
+                            icon: selectedIcon
+                        });
+                    }
+                };
+                saveData(date, formData, selectedIcon);
+            }
+        }
+    }, [location.state, auth.currentUser]); // auth.currentUserを依存配列に追加
+
 
     const generateCalendar = () => {
         const startDay = currentMonth.clone().startOf('month').startOf('week');
