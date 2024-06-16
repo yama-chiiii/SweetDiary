@@ -11,12 +11,13 @@ import Sour from './image/sour.png';
 import Sweet from './image/sweet.png';
 
 const iconMapping = {
-    Sweet: Sweet,
-    Hot: Hot,
-    Sour: Sour,
-    Salty: Salty,
-    Cat: Cat
+    Sweet: { image: Sweet, label: 'あまい' },
+    Hot: { image: Hot, label: 'からい' },
+    Sour: { image: Sour, label: 'すっぱい' },
+    Salty: { image: Salty, label: 'しょっぱい' },
+    Cat: { image: Cat, label: 'その他' }
 };
+
 
 const DetailsForm = () => {
     const location = useLocation();
@@ -96,13 +97,9 @@ const DetailsForm = () => {
                 ...formData,
                 selectedIcon
             }, { merge: true });
-            console.log('Document successfully written!');
             setIsEditing(false);
-            console.log('Editing mode ended');
             navigate('/home');
-            console.log('Navigation to /home triggered');
         } catch (error) {
-            console.error("Error writing document: ", error);
             alert('保存に失敗しました。エラーを確認してください。');
         }
     };
@@ -130,31 +127,65 @@ const DetailsForm = () => {
                 <p className='pt-12 pb-8 text-4xl'>{formattedDate}</p>
                 <div className='flex flex-col items-center w-3/4 rounded bg-pink-100 mb-12'>
                     <div className='w-3/4 flex justify-between pb-4'>
-                        {Object.entries(iconMapping).map(([iconType, iconImg]) => (
+                        {Object.entries(iconMapping).map(([iconType, { image, label }]) => (
                             <div key={iconType} className={`flex flex-col items-center p-2 ${iconClass(iconType)}`} onClick={() => handleIconSelect(iconType)}>
-                                <img src={iconImg} alt={`${iconType} icon`} style={{ width: "100px" }} />
-                                <p>{iconType.toLowerCase()}</p>
+                                <img src={image} alt={`${label} icon`} style={{ width: "100px" }} />
+                                <p>{label}</p>
                             </div>
                         ))}
                     </div>
-                    <div className='flex flex-row items-center'>
-                        <p className='py-8 text-2xl whitespace-nowrap'>お菓子名：</p>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} className='h-12 w-full' disabled={!isEditing} />
+
+                    <div className="flex flex-row items-center">
+                        <p className="py-8 text-2xl whitespace-nowrap">お菓子名：</p>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className={`h-12 w-full px-4  border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${!isEditing ? 'text-center' : ''}`}
+                            disabled={!isEditing}
+                        />
                     </div>
                 </div>
                 <div className='flex flex-col w-3/4 rounded bg-pink-100 pl-16 mb-12 pt-4'>
                     <div className='flex flex-row items-center'>
                         <p className='py-4 text-2xl'>かろりー：</p>
-                        <input type="text" id="cal" name="cal" value={formData.cal} onChange={handleInputChange} className='h-12 w-1/2' disabled={!isEditing} />
+                        <input
+                            type="text"
+                            id="cal"
+                            name="cal"
+                            value={formData.cal}
+                            onChange={handleInputChange}
+                            className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${!isEditing ? 'text-center' : ''}`}
+                            disabled={!isEditing}
+                        />
+                        <p className='py-4 text-sm'>kcal</p>
                     </div>
                     <div className='flex flex-row items-center'>
                         <p className='py-4 pl-6 text-2xl'>かかく：</p>
-                        <input type="text" id="price" name="price" value={formData.price} onChange={handleInputChange} className='h-12 w-1/2' disabled={!isEditing} />
+                        <input
+                            type="text"
+                            id="price"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleInputChange}
+                            className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${!isEditing ? 'text-center' : ''}`}
+                            disabled={!isEditing} />
+                        <p className='py-4 text-sm'>えん</p>
                     </div>
                     <div className='flex flex-row items-center'>
-                        <p className='pt-4 py-12 text-2xl'>かんそう：</p>
-                        <input type="text" id="thoughts" name="thoughts" value={formData.thoughts} onChange={handleInputChange} className='h-12 w-1/2' disabled={!isEditing} />
+                        <p className='py-4 text-2xl'>かんそう：</p>
+                        <input
+                            type="text"
+                            id="thoughts"
+                            name="thoughts"
+                            value={formData.thoughts}
+                            onChange={handleInputChange}
+                            className={`h-12 w-2/3 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${!isEditing ? 'text-center' : ''}`}
+                            disabled={!isEditing} />
                     </div>
+                    <div className='pb-4' />
                 </div>
                 <div className='w-3/4 flex justify-around pb-12'>
                     <button onClick={handleBack} className='w-40 h-12 rounded-md bg-pink-100 text-2xl'>もどる</button>

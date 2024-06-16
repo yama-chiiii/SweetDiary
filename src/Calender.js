@@ -1,10 +1,9 @@
 import { getAuth, signOut } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import moment from 'moment';
 import 'moment/locale/ja'; // 日本語のロケールをインポート
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useIcons } from './context/IconContext';
 import UserContext from './context/UseContext'; // インポートパスを修正
 import { db } from './firebase-config'; // Firebaseのインポート
 import ameImg from './image/ame.png';
@@ -17,6 +16,7 @@ import Salty from './image/salty.png';
 import Sour from './image/sour.png';
 import Sweet from './image/sweet.png';
 
+
 moment.locale('ja');
 
 const Calendar = () => {
@@ -25,8 +25,8 @@ const Calendar = () => {
     const { user, setUser } = useContext(UserContext);
     const auth = getAuth();
     const navigate = useNavigate();
-    const { icons } = useIcons();
     const location = useLocation();
+    const [icons, setIcons] = useState({});
 
     useEffect(() => {
         if (location.state) {
@@ -45,8 +45,7 @@ const Calendar = () => {
                 saveData(date, formData, selectedIcon);
             }
         }
-    }, [location.state, auth.currentUser]); // auth.currentUserを依存配列に追加
-
+    }, [location.state, auth.currentUser]);
 
     const generateCalendar = () => {
         const startDay = currentMonth.clone().startOf('month').startOf('week');
@@ -75,6 +74,27 @@ const Calendar = () => {
         fetchUser();
     }, [auth, setUser]);
 
+    useEffect(() => {
+        const fetchIcons = async () => {
+            if (auth.currentUser) {
+                const iconsRef = collection(db, "users", auth.currentUser.uid, "details");
+                const snapshot = await getDocs(iconsRef);
+                const iconsData = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    console.log("Fetched data:", data);  // データ構造を確認
+                    iconsData[doc.id] = data.selectedIcon;  // 'selectedIcon'を取得
+                });
+                console.log("Icons data set:", iconsData);  // ステートに設定されるデータを確認
+                setIcons(iconsData);
+            }
+        };
+
+        fetchIcons();
+    }, [auth.currentUser, setIcons]);
+
+
+
     const nextMonth = () => {
         setCurrentMonth(currentMonth.clone().add(1, 'months'));
     };
@@ -94,7 +114,6 @@ const Calendar = () => {
     };
 
     const handleDateClick = (day) => {
-        // DetailsFormに遷移し、日付をパラメータとして渡す
         navigate('/details', { state: { date: day.format('YYYY-MM-DD') } });
     };
 
@@ -130,9 +149,9 @@ const Calendar = () => {
             </div>
             <div className="flex flex-col items-center flex-grow p-8 min-h-full">
                 <div className="flex justify-between items-center w-full mb-16">
-                    <button onClick={previousMonth} className="text-xl font-semibold">⇐ 前</button>
+                    <button onClick={previousMonth} className="text-xl font-semibold">⇐ まえ</button>
                     <h2 className="text-4xl font-bold">{currentMonth.format('YYYY年 M月')}</h2>
-                    <button onClick={nextMonth} className="text-xl font-semibold">次 ⇒</button>
+                    <button onClick={nextMonth} className="text-xl font-semibold">つぎ ⇒</button>
                 </div>
                 <div className="grid grid-cols-7 gap-4 w-full">
                     {days.map((day, index) => (
@@ -148,12 +167,10 @@ const Calendar = () => {
                     {calendar.map((week, weekIndex) => (
                         <React.Fragment key={weekIndex}>
                             {week.map((day) => {
-                                // const date = day.date();
                                 const dateKey = day.format('YYYY-MM-DD');
                                 const icon = icons[dateKey];
                                 const iconSrc = { Sweet, Hot, Sour, Salty, Cat }[icon];
                                 const isCurrentMonth = day.isSame(currentMonth, 'month');
-                                // const isToday = date === parseInt(today, 10) && day.isSame(moment(), 'day');
 
                                 return (
                                     <div key={dateKey} className="flex flex-col items-center justify-center"
