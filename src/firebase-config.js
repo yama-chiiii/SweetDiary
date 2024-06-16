@@ -11,6 +11,7 @@ const firebaseConfig = {
     appId: "1:43675353573:web:e0e3b"
 };
 
+
 // Firebaseを初期化
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

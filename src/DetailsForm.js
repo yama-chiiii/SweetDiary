@@ -1,12 +1,22 @@
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIcons } from './context/IconContext';
+import { auth, db } from './firebase-config';
 import Cat from './image/cat.png';
 import Hot from './image/hot.png';
 import Salty from './image/salty.png';
 import Sour from './image/sour.png';
 import Sweet from './image/sweet.png';
+
+const iconMapping = {
+    Sweet: Sweet,
+    Hot: Hot,
+    Sour: Sour,
+    Salty: Salty,
+    Cat: Cat
+};
 
 const DetailsForm = () => {
     const location = useLocation();
@@ -15,7 +25,7 @@ const DetailsForm = () => {
     const formattedDate = moment(date).format('MがつDにち');
     const { setIconForDate } = useIcons();
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedIcon, setSelectedIcon] = useState(''); // デフォルト値を設定
+    const [selectedIcon, setSelectedIcon] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         cal: '',
@@ -25,10 +35,29 @@ const DetailsForm = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            // Firebaseからデータを取得する処理
+            if (auth.currentUser) {
+                const docRef = doc(db, "users", auth.currentUser.uid, "details", date);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setFormData({
+                        name: data.name || '',
+                        cal: data.cal || '',
+                        price: data.price || '',
+                        thoughts: data.thoughts || ''
+                    });
+                    setSelectedIcon(data.selectedIcon || '');
+                } else {
+                    setFormData({ name: '', cal: '', price: '', thoughts: '' });
+                    setSelectedIcon('');
+                }
+            } else {
+                console.log("No user logged in");
+                navigate("/login");
+            }
         };
         fetchData();
-    }, [date]);
+    }, [date, navigate]);
 
     const handleIconSelect = (icon) => {
         if (isEditing) {
@@ -39,26 +68,51 @@ const DetailsForm = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
-        if (selectedIcon === '') {
+        console.log('Save started');
+
+        if (!auth.currentUser) {
+            console.log('No user logged in at save attempt');
+            alert('ログインされていません。');
+            return;
+        }
+
+        if (!selectedIcon) {
+            console.log('No icon selected at save attempt');
             alert('アイコンを選択してください');
             return;
         }
-        navigate('/home', {
-            state: {
-                date,
-                formData,
+
+        const docRef = doc(db, "users", auth.currentUser.uid, "details", date);
+        console.log(`Attempting to write document with data:`, { name: formData.name, cal: formData.cal, price: formData.price, thoughts: formData.thoughts, selectedIcon });
+        console.log(`Path used: /users/${auth.currentUser.uid}/details/${date}`);
+
+        try {
+            await setDoc(docRef, {
+                ...formData,
                 selectedIcon
-            }
-        });
+            }, { merge: true });
+            console.log('Document successfully written!');
+            setIsEditing(false);
+            console.log('Editing mode ended');
+            navigate('/home');
+            console.log('Navigation to /home triggered');
+        } catch (error) {
+            console.error("Error writing document: ", error);
+            alert('保存に失敗しました。エラーを確認してください。');
+        }
     };
+
+
+
+
+    useEffect(() => {
+        console.log('Editing State changed:', isEditing);
+    }, [isEditing]);
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -75,28 +129,13 @@ const DetailsForm = () => {
             <div className="flex flex-col items-center bg-white h-full w-3/4">
                 <p className='pt-12 pb-8 text-4xl'>{formattedDate}</p>
                 <div className='flex flex-col items-center w-3/4 rounded bg-pink-100 mb-12'>
-                    <p className='pt-12 pb-8 text-2xl'>今日のおかしは？</p>
                     <div className='w-3/4 flex justify-between pb-4'>
-                        <div className={`flex flex-col items-center p-2 ${iconClass('Sweet')}`} onClick={() => handleIconSelect('Sweet')}>
-                            <img src={Sweet} alt="Candy" style={{ width: "100px" }} />
-                            <p>あまい</p>
-                        </div>
-                        <div className={`flex flex-col items-center p-2 ${iconClass('Hot')}`} onClick={() => handleIconSelect('Hot')}>
-                            <img src={Hot} alt="Candy" style={{ width: "100px" }} />
-                            <p>からい</p>
-                        </div>
-                        <div className={`flex flex-col items-center p-2 ${iconClass('Sour')}`} onClick={() => handleIconSelect('Sour')}>
-                            <img src={Sour} alt="Candy" style={{ width: "100px" }} />
-                            <p>すっぱい</p>
-                        </div>
-                        <div className={`flex flex-col items-center p-2 ${iconClass('Salty')}`} onClick={() => handleIconSelect('Salty')}>
-                            <img src={Salty} alt="Candy" style={{ width: "100px" }} />
-                            <p>しょっぱい</p>
-                        </div>
-                        <div className={`flex flex-col items-center p-2 ${iconClass('Cat')}`} onClick={() => handleIconSelect('Cat')}>
-                            <img src={Cat} alt="Candy" style={{ width: "100px" }} />
-                            <p>その他</p>
-                        </div>
+                        {Object.entries(iconMapping).map(([iconType, iconImg]) => (
+                            <div key={iconType} className={`flex flex-col items-center p-2 ${iconClass(iconType)}`} onClick={() => handleIconSelect(iconType)}>
+                                <img src={iconImg} alt={`${iconType} icon`} style={{ width: "100px" }} />
+                                <p>{iconType.toLowerCase()}</p>
+                            </div>
+                        ))}
                     </div>
                     <div className='flex flex-row items-center'>
                         <p className='py-8 text-2xl whitespace-nowrap'>お菓子名：</p>
