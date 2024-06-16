@@ -1,5 +1,5 @@
-import { getAuth, signOut } from 'firebase/auth';
-import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import moment from 'moment';
 import 'moment/locale/ja'; // 日本語のロケールをインポート
 import React, { useContext, useEffect, useState } from 'react';
@@ -16,7 +16,6 @@ import Salty from './image/salty.png';
 import Sour from './image/sour.png';
 import Sweet from './image/sweet.png';
 
-
 moment.locale('ja');
 
 const Calendar = () => {
@@ -27,6 +26,24 @@ const Calendar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [icons, setIcons] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+    const [goalData, setGoalData] = useState({
+        priceGoal: '',
+        calorieGoal: ''
+    });
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);
+            } else {
+                console.log("No user logged in");
+                navigate("/login");
+            }
+        });
+
+        return () => unsubscribe();
+    }, [auth, navigate, setUser]);
 
     useEffect(() => {
         if (location.state) {
@@ -46,6 +63,46 @@ const Calendar = () => {
             }
         }
     }, [location.state, auth.currentUser]);
+
+    useEffect(() => {
+        const fetchGoalData = async () => {
+            if (auth.currentUser) {
+                const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format('YYYY-MM'));
+                const goalSnap = await getDoc(goalRef);
+                if (goalSnap.exists()) {
+                    setGoalData(goalSnap.data());
+                } else {
+                    setGoalData({
+                        priceGoal: '',
+                        calorieGoal: ''
+                    });
+                }
+            }
+        };
+
+        fetchGoalData();
+    }, [auth.currentUser, currentMonth]);
+
+    const handleGoalInputChange = (e) => {
+        const { name, value } = e.target;
+        setGoalData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleGoalSave = async () => {
+        if (!auth.currentUser) {
+            alert('ログインされていません。');
+            return;
+        }
+
+        const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format('YYYY-MM'));
+        try {
+            await setDoc(goalRef, goalData, { merge: true });
+            setIsEditing(false);
+        } catch (error) {
+            console.error('保存に失敗しました。エラーを確認してください。', error);
+            alert('保存に失敗しました。エラーを確認してください。');
+        }
+    };
 
     const generateCalendar = () => {
         const startDay = currentMonth.clone().startOf('month').startOf('week');
@@ -82,18 +139,14 @@ const Calendar = () => {
                 const iconsData = {};
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    console.log("Fetched data:", data);  // データ構造を確認
-                    iconsData[doc.id] = data.selectedIcon;  // 'selectedIcon'を取得
+                    iconsData[doc.id] = data.selectedIcon; // Correct the field name to 'selectedIcon'
                 });
-                console.log("Icons data set:", iconsData);  // ステートに設定されるデータを確認
                 setIcons(iconsData);
             }
         };
 
         fetchIcons();
-    }, [auth.currentUser, setIcons]);
-
-
+    }, [auth.currentUser]);
 
     const nextMonth = () => {
         setCurrentMonth(currentMonth.clone().add(1, 'months'));
@@ -128,19 +181,48 @@ const Calendar = () => {
                     <div className='flex flex-row-reverse items-end'>
                         <img src={candyImg} alt="Candy" style={{ width: "100px", position: "relative", bottom: "-80px" }} />
                     </div>
-                    <div className="flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
-                        <p className="text-3xl mb-12">もくひょう！</p>
-                        <p className="text-2xl">かかく</p>
-                        <input className="bg-transparent outline-none border-none w-full text-lg ml-8 mb-4" placeholder="3000円/10000円" />
-                        <p className="text-2xl">かろりー</p>
-                        <input className="bg-transparent outline-none border-none w-full text-lg ml-8 mb-6" placeholder="3000kcal/10000kcal" />
+                    <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
+                        <p className="text-3xl mb-12">今月のもくひょう！</p>
+                        <div className="w-full flex flex-row items-center mb-6">
+                            <p className="w-1/4 text-xl mr-4 whitespace-nowrap">かかく</p>
+                            <input
+                                type="number"
+                                name="priceGoal"
+                                value={goalData.priceGoal}
+                                onChange={handleGoalInputChange}
+                                className={`w-2/4 bg-transparent outline-none text-lg no-spin ${isEditing ? 'border border-black rounded' : 'border-none'}`}
+                                placeholder="10000円"
+                                disabled={!isEditing}
+                            />
+                            <p>円</p>
+                        </div>
+                        <div className="w-full flex flex-row items-center mb-6">
+                            <p className="w-1/4 text-xl mr-4 whitespace-nowrap">かろりー</p>
+                            <input
+                                type="number"
+                                name="calorieGoal"
+                                value={goalData.calorieGoal}
+                                onChange={handleGoalInputChange}
+                                className={`w-2/4 bg-transparent outline-none text-lg no-spin ${isEditing ? 'border border-black rounded' : 'border-none'}`}
+                                placeholder="10000kcal"
+                                disabled={!isEditing}
+                            />
+                            <p>kcal</p>
+                        </div>
+                        <div className='flex flex-col items-center w-full'>
+                            {isEditing ? (
+                                <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">ほぞん</button>
+                            ) : (
+                                <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">へんしゅう</button>
+                            )}
+                        </div>
                     </div>
                     <div className='flex flex-row justify-between'>
                         <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
                         <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
                     </div>
                 </div>
-                <div className='flex flex-row justify-around  w-full'>
+                <div className='flex flex-row justify-around w-full'>
                     <div className='flex flex-col-reverse'>
                         <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4">ログアウト</button>
                     </div>
