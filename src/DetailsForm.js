@@ -18,7 +18,6 @@ const iconMapping = {
     Cat: { image: Cat, label: 'その他' }
 };
 
-
 const DetailsForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -95,7 +94,8 @@ const DetailsForm = () => {
         try {
             await setDoc(docRef, {
                 ...formData,
-                selectedIcon
+                selectedIcon,
+                date: date  // 追加: 日付フィールドを保存
             }, { merge: true });
             setIsEditing(false);
             navigate('/home');
@@ -103,9 +103,6 @@ const DetailsForm = () => {
             alert('保存に失敗しました。エラーを確認してください。');
         }
     };
-
-
-
 
     useEffect(() => {
         console.log('Editing State changed:', isEditing);
@@ -126,6 +123,7 @@ const DetailsForm = () => {
             <div className="flex flex-col items-center bg-white h-full w-3/4">
                 <p className='pt-12 pb-8 text-4xl'>{formattedDate}</p>
                 <div className='flex flex-col items-center w-3/4 rounded bg-pink-100 mb-12'>
+                    <p className='my-4 text-xl'>きょうのおかしはどんなあじ？</p>
                     <div className='w-3/4 flex justify-between pb-4'>
                         {Object.entries(iconMapping).map(([iconType, { image, label }]) => (
                             <div key={iconType} className={`flex flex-col items-center p-2 ${iconClass(iconType)}`} onClick={() => handleIconSelect(iconType)}>
@@ -152,7 +150,7 @@ const DetailsForm = () => {
                     <div className='flex flex-row items-center'>
                         <p className='py-4 text-2xl'>かろりー：</p>
                         <input
-                            type="text"
+                            type="number"
                             id="cal"
                             name="cal"
                             value={formData.cal}
@@ -165,7 +163,7 @@ const DetailsForm = () => {
                     <div className='flex flex-row items-center'>
                         <p className='py-4 pl-6 text-2xl'>かかく：</p>
                         <input
-                            type="text"
+                            type="number"
                             id="price"
                             name="price"
                             value={formData.price}

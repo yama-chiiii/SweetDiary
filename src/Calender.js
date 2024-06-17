@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import moment from 'moment';
 import 'moment/locale/ja'; // 日本語のロケールをインポート
 import React, { useContext, useEffect, useState } from 'react';
@@ -30,6 +30,10 @@ const Calendar = () => {
     const [goalData, setGoalData] = useState({
         priceGoal: '',
         calorieGoal: ''
+    });
+    const [totalData, setTotalData] = useState({
+        totalPrice: 0,
+        totalCalorie: 0
     });
 
     useEffect(() => {
@@ -82,6 +86,42 @@ const Calendar = () => {
 
         fetchGoalData();
     }, [auth.currentUser, currentMonth]);
+
+    useEffect(() => {
+        const fetchTotalData = async () => {
+            if (auth.currentUser) {
+                const startOfMonth = currentMonth.startOf('month').format('YYYY-MM-DD');
+                const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
+                const detailsQuery = query(
+                    collection(db, "users", auth.currentUser.uid, "details"),
+                    where("date", ">=", startOfMonth),
+                    where("date", "<=", endOfMonth)
+                );
+
+                try {
+                    const snapshot = await getDocs(detailsQuery);
+                    let totalPrice = 0;
+                    let totalCalorie = 0;
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        console.log(`Fetched document: `, data);  // 追加: 取得データをログに表示
+                        totalPrice += parseFloat(data.price || 0);
+                        totalCalorie += parseFloat(data.cal || 0);
+                    });
+
+                    setTotalData({
+                        totalPrice,
+                        totalCalorie
+                    });
+                } catch (error) {
+                    console.error('Error fetching total data:', error);  // 追加: エラーをログに表示
+                }
+            }
+        };
+
+        fetchTotalData();
+    }, [auth.currentUser, currentMonth]);
+
 
     const handleGoalInputChange = (e) => {
         const { name, value } = e.target;
@@ -183,31 +223,43 @@ const Calendar = () => {
                     </div>
                     <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
                         <p className="text-3xl mb-12">今月のもくひょう！</p>
-                        <div className="w-full flex flex-row items-center mb-6">
-                            <p className="w-1/4 text-xl mr-4 whitespace-nowrap">かかく</p>
-                            <input
-                                type="number"
-                                name="priceGoal"
-                                value={goalData.priceGoal}
-                                onChange={handleGoalInputChange}
-                                className={`w-2/4 bg-transparent outline-none text-lg no-spin ${isEditing ? 'border border-black rounded' : 'border-none'}`}
-                                placeholder="10000円"
-                                disabled={!isEditing}
-                            />
-                            <p>円</p>
+                        <div className="w-full mb-6">
+                            <p className="text-xl mr-4 whitespace-nowrap">かかく</p>
+                            <div className="flex items-center">
+                                <p className="text-lg">{totalData.totalPrice} 円</p>
+                                <span className="mx-2">/</span>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        name="priceGoal"
+                                        value={goalData.priceGoal}
+                                        onChange={handleGoalInputChange}
+                                        className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                        placeholder="目標かかく"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{goalData.priceGoal} 円</p>
+                                )}
+                            </div>
                         </div>
-                        <div className="w-full flex flex-row items-center mb-6">
-                            <p className="w-1/4 text-xl mr-4 whitespace-nowrap">かろりー</p>
-                            <input
-                                type="number"
-                                name="calorieGoal"
-                                value={goalData.calorieGoal}
-                                onChange={handleGoalInputChange}
-                                className={`w-2/4 bg-transparent outline-none text-lg no-spin ${isEditing ? 'border border-black rounded' : 'border-none'}`}
-                                placeholder="10000kcal"
-                                disabled={!isEditing}
-                            />
-                            <p>kcal</p>
+                        <div className="w-full mb-6">
+                            <p className="text-xl mr-4 whitespace-nowrap">かろりー</p>
+                            <div className="flex items-center">
+                                <p className="text-lg">{totalData.totalCalorie} kcal</p>
+                                <span className="mx-2">/</span>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        name="calorieGoal"
+                                        value={goalData.calorieGoal}
+                                        onChange={handleGoalInputChange}
+                                        className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                        placeholder="目標かろりー"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{goalData.calorieGoal} kcal</p>
+                                )}
+                            </div>
                         </div>
                         <div className='flex flex-col items-center w-full'>
                             {isEditing ? (
