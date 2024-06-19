@@ -1,11 +1,11 @@
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
-import moment from "moment";
-import "moment/locale/ja"; // 日本語のロケールをインポート
+import moment, { Moment } from "moment";
+import "moment/locale/ja";
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import UserContext from "./context/UseContext"; // インポートパスを修正
-import { db } from "./firebase-config"; // Firebaseのインポート
+import UserContext from "./context/UseContext";
+import { db } from "./firebase-config";
 import ameImg from "./image/ame.png";
 import cakeDrinkImg from "./image/cake&drink.png";
 import cakeImg from "./image/cake.png";
@@ -27,10 +27,16 @@ const Calendar = () => {
     const location = useLocation();
     const [icons, setIcons] = useState<{ [key: string]: any }>({});
     const [isEditing, setIsEditing] = useState(false);
-    const [goalData, setGoalData] = useState({
+    const [goalData, setGoalData] = useState<{
+        priceGoal: string;
+        calorieGoal: string;
+        lastEdited: string | null;
+    }>({
         priceGoal: "",
         calorieGoal: "",
+        lastEdited: null,
     });
+
     const [totalData, setTotalData] = useState({
         totalPrice: 0,
         totalCalorie: 0,
@@ -74,10 +80,14 @@ const Calendar = () => {
                 const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
                 const goalSnap = await getDoc(goalRef);
                 if (goalSnap.exists()) {
-                    const data = goalSnap.data() as { priceGoal: string; calorieGoal: string };
-                    setGoalData(data);
+                    const data = goalSnap.data();
+                    setGoalData({
+                        priceGoal: data.priceGoal || "",
+                        calorieGoal: data.calorieGoal || "",
+                        lastEdited: data.lastEdited || null,
+                    });
                 } else {
-                    setGoalData({ priceGoal: "", calorieGoal: "" });
+                    setGoalData({ priceGoal: "", calorieGoal: "", lastEdited: null });
                 }
             }
         };
@@ -123,22 +133,6 @@ const Calendar = () => {
     const handleGoalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setGoalData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleGoalSave = async () => {
-        if (!auth.currentUser) {
-            alert("ログインされていません。");
-            return;
-        }
-
-        const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
-        try {
-            await setDoc(goalRef, goalData, { merge: true });
-            setIsEditing(false);
-        } catch (error) {
-            console.error("保存に失敗しました。エラーを確認してください。", error);
-            alert("保存に失敗しました。エラーを確認してください。");
-        }
     };
 
     const generateCalendar = () => {
@@ -187,6 +181,27 @@ const Calendar = () => {
         fetchIcons();
     }, [auth.currentUser]);
 
+    useEffect(() => {
+        const fetchGoalData = async () => {
+            if (auth.currentUser) {
+                const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
+                const goalSnap = await getDoc(goalRef);
+                if (goalSnap.exists()) {
+                    const data = goalSnap.data();
+                    setGoalData({
+                        priceGoal: data.priceGoal || "",
+                        calorieGoal: data.calorieGoal || "",
+                        lastEdited: data.lastEdited, // このタイムスタンプを保存
+                    });
+                } else {
+                    setGoalData({ priceGoal: "", calorieGoal: "", lastEdited: null });
+                }
+            }
+        };
+
+        fetchGoalData();
+    }, [auth.currentUser, currentMonth]);
+
     const nextMonth = () => {
         setCurrentMonth(currentMonth.clone().add(1, "months"));
     };
@@ -205,8 +220,51 @@ const Calendar = () => {
             });
     };
 
+    const handleGoalSave = async () => {
+        if (!auth.currentUser) {
+            alert("ログインされていません。");
+            return;
+        }
+
+        const now = moment();
+        const lastEdited = moment(goalData.lastEdited);
+        if (lastEdited.isValid() && lastEdited.isSame(now, "month")) {
+            alert("今月はすでに目標を編集済みです。");
+            return;
+        }
+
+        const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
+        try {
+            await setDoc(
+                goalRef,
+                {
+                    ...goalData,
+                    lastEdited: now.toISOString(), // 編集日時を更新
+                },
+                { merge: true }
+            );
+            setIsEditing(false);
+            alert("目標を保存しました。");
+        } catch (error) {
+            console.error("保存に失敗しました。エラーを確認してください。", error);
+            alert("保存に失敗しました。エラーを確認してください。");
+        }
+    };
+
     const handleDateClick = (day: moment.Moment) => {
         navigate("/details", { state: { date: day.format("YYYY-MM-DD") } });
+    };
+
+    const generateDayClass = (day: Moment): string => {
+        let classes = "flex flex-col items-center justify-center text-lg ";
+        if (day.day() === 0) {
+            // 日曜日
+            classes += "text-red-500 ";
+        } else if (day.day() === 6) {
+            // 土曜日
+            classes += "text-blue-500 ";
+        }
+        return classes;
     };
 
     return (
@@ -270,11 +328,12 @@ const Calendar = () => {
                                     へんしゅう
                                 </button>
                             )}
+                            <p className="text-xs text-red-500">※月に1回しかへんしゅうできないからちゅうい！</p>
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
-                        <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
-                        <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
+                        <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-44px" }} />
+                        <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-52px" }} />
                     </div>
                 </div>
                 <div className="flex flex-row justify-around w-full">
@@ -299,7 +358,7 @@ const Calendar = () => {
                 <div className="grid grid-cols-7 gap-4 w-full">
                     {days.map((day, index) => (
                         <div
-                            key={day}
+                            key={index}
                             className={`text-center text-lg font-medium ${
                                 index === 0 ? "text-red-500" : index === 6 ? "text-blue-500" : "text-gray-500"
                             }`}
@@ -313,14 +372,15 @@ const Calendar = () => {
                         <React.Fragment key={weekIndex}>
                             {week.map((day) => {
                                 const dateKey = day.format("YYYY-MM-DD");
-                                const icon = icons[dateKey]; // アイコンのキーを取得
+                                const icon = icons[dateKey];
                                 const iconMapping: { [key: string]: string } = { Sweet, Hot, Sour, Salty, Cat };
-                                const iconSrc = iconMapping[icon]; // アイコンのソースをマッピングから取得
-
+                                const iconSrc = iconMapping[icon];
+                                const isToday = day.isSame(moment(), "day");
+                                const dayClasses = generateDayClass(day);
                                 const isCurrentMonth = day.isSame(currentMonth, "month");
 
                                 return (
-                                    <div key={dateKey} className="flex flex-col items-center justify-center" onClick={() => handleDateClick(day)}>
+                                    <div key={dateKey} className={dayClasses} onClick={() => handleDateClick(day)}>
                                         {isCurrentMonth && (
                                             <>
                                                 {iconSrc ? (
@@ -328,7 +388,7 @@ const Calendar = () => {
                                                 ) : (
                                                     <div className={`w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center mb-2`}></div>
                                                 )}
-                                                <span className={`text-lg ${day.isSame(moment(), "day") ? "text-pink-500" : "text-black"}`}>
+                                                <span className={`${isToday ? "bg-pink-300 rounded-full px-1 text-white" : ""}`}>
                                                     {day.date().toString().padStart(2, "0")}
                                                 </span>
                                             </>
