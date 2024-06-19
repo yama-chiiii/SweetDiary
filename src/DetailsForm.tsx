@@ -173,7 +173,7 @@ const DetailsForm = () => {
                             onChange={handleInputChange}
                             className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
                                 !isEditing ? "text-center" : ""
-                            }`}
+                            } no-spin`}
                             disabled={!isEditing}
                         />
                         <p className="py-4 text-sm">kcal</p>
@@ -188,7 +188,7 @@ const DetailsForm = () => {
                             onChange={handleInputChange}
                             className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
                                 !isEditing ? "text-center" : ""
-                            }`}
+                            } no-spin`}
                             disabled={!isEditing}
                         />
                         <p className="py-4 text-sm">えん</p>
