@@ -1,39 +1,39 @@
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import moment from 'moment';
-import 'moment/locale/ja'; // 日本語のロケールをインポート
-import React, { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import UserContext from './context/UseContext'; // インポートパスを修正
-import { db } from './firebase-config'; // Firebaseのインポート
-import ameImg from './image/ame.png';
-import cakeDrinkImg from './image/cake&drink.png';
-import cakeImg from './image/cake.png';
-import candyImg from './image/candy.png';
-import Cat from './image/cat.png';
-import Hot from './image/hot.png';
-import Salty from './image/salty.png';
-import Sour from './image/sour.png';
-import Sweet from './image/sweet.png';
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import moment from "moment";
+import "moment/locale/ja"; // 日本語のロケールをインポート
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import UserContext from "./context/UseContext"; // インポートパスを修正
+import { db } from "./firebase-config"; // Firebaseのインポート
+import ameImg from "./image/ame.png";
+import cakeDrinkImg from "./image/cake&drink.png";
+import cakeImg from "./image/cake.png";
+import candyImg from "./image/candy.png";
+import Cat from "./image/cat.png";
+import Hot from "./image/hot.png";
+import Salty from "./image/salty.png";
+import Sour from "./image/sour.png";
+import Sweet from "./image/sweet.png";
 
-moment.locale('ja');
+moment.locale("ja");
 
 const Calendar = () => {
     const [currentMonth, setCurrentMonth] = useState(moment());
-    const days = ['にち', 'げつ', 'か', 'すい', 'もく', 'きん', 'ど'];
+    const days = ["にち", "げつ", "か", "すい", "もく", "きん", "ど"];
     const { user, setUser } = useContext(UserContext);
     const auth = getAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const [icons, setIcons] = useState({});
+    const [icons, setIcons] = useState<{ [key: string]: any }>({});
     const [isEditing, setIsEditing] = useState(false);
     const [goalData, setGoalData] = useState({
-        priceGoal: '',
-        calorieGoal: ''
+        priceGoal: "",
+        calorieGoal: "",
     });
     const [totalData, setTotalData] = useState({
         totalPrice: 0,
-        totalCalorie: 0
+        totalCalorie: 0,
     });
 
     useEffect(() => {
@@ -53,13 +53,13 @@ const Calendar = () => {
         if (location.state) {
             const { date, formData, selectedIcon } = location.state;
             if (selectedIcon !== undefined) {
-                const saveData = async (date, formData, selectedIcon) => {
+                const saveData = async (date: string, formData: any, selectedIcon: any) => {
                     const user = auth.currentUser;
                     if (user) {
                         const docRef = doc(db, "users", user.uid, "details", date);
                         await setDoc(docRef, {
                             ...formData,
-                            icon: selectedIcon
+                            icon: selectedIcon,
                         });
                     }
                 };
@@ -71,15 +71,13 @@ const Calendar = () => {
     useEffect(() => {
         const fetchGoalData = async () => {
             if (auth.currentUser) {
-                const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format('YYYY-MM'));
+                const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
                 const goalSnap = await getDoc(goalRef);
                 if (goalSnap.exists()) {
-                    setGoalData(goalSnap.data());
+                    const data = goalSnap.data() as { priceGoal: string; calorieGoal: string };
+                    setGoalData(data);
                 } else {
-                    setGoalData({
-                        priceGoal: '',
-                        calorieGoal: ''
-                    });
+                    setGoalData({ priceGoal: "", calorieGoal: "" });
                 }
             }
         };
@@ -90,8 +88,8 @@ const Calendar = () => {
     useEffect(() => {
         const fetchTotalData = async () => {
             if (auth.currentUser) {
-                const startOfMonth = currentMonth.startOf('month').format('YYYY-MM-DD');
-                const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
+                const startOfMonth = currentMonth.startOf("month").format("YYYY-MM-DD");
+                const endOfMonth = currentMonth.endOf("month").format("YYYY-MM-DD");
                 const detailsQuery = query(
                     collection(db, "users", auth.currentUser.uid, "details"),
                     where("date", ">=", startOfMonth),
@@ -102,19 +100,19 @@ const Calendar = () => {
                     const snapshot = await getDocs(detailsQuery);
                     let totalPrice = 0;
                     let totalCalorie = 0;
-                    snapshot.forEach(doc => {
+                    snapshot.forEach((doc) => {
                         const data = doc.data();
-                        console.log(`Fetched document: `, data);  // 追加: 取得データをログに表示
+                        console.log(`Fetched document: `, data); // 追加: 取得データをログに表示
                         totalPrice += parseFloat(data.price || 0);
                         totalCalorie += parseFloat(data.cal || 0);
                     });
 
                     setTotalData({
                         totalPrice,
-                        totalCalorie
+                        totalCalorie,
                     });
                 } catch (error) {
-                    console.error('Error fetching total data:', error);  // 追加: エラーをログに表示
+                    console.error("Error fetching total data:", error); // 追加: エラーをログに表示
                 }
             }
         };
@@ -122,37 +120,38 @@ const Calendar = () => {
         fetchTotalData();
     }, [auth.currentUser, currentMonth]);
 
-
-    const handleGoalInputChange = (e) => {
+    const handleGoalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setGoalData(prev => ({ ...prev, [name]: value }));
+        setGoalData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleGoalSave = async () => {
         if (!auth.currentUser) {
-            alert('ログインされていません。');
+            alert("ログインされていません。");
             return;
         }
 
-        const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format('YYYY-MM'));
+        const goalRef = doc(db, "users", auth.currentUser.uid, "goals", currentMonth.format("YYYY-MM"));
         try {
             await setDoc(goalRef, goalData, { merge: true });
             setIsEditing(false);
         } catch (error) {
-            console.error('保存に失敗しました。エラーを確認してください。', error);
-            alert('保存に失敗しました。エラーを確認してください。');
+            console.error("保存に失敗しました。エラーを確認してください。", error);
+            alert("保存に失敗しました。エラーを確認してください。");
         }
     };
 
     const generateCalendar = () => {
-        const startDay = currentMonth.clone().startOf('month').startOf('week');
-        const endDay = currentMonth.clone().endOf('month').endOf('week');
-        const day = startDay.clone().subtract(1, 'day');
+        const startDay = currentMonth.clone().startOf("month").startOf("week");
+        const endDay = currentMonth.clone().endOf("month").endOf("week");
+        const day = startDay.clone().subtract(1, "day");
         const calendar = [];
 
-        while (day.isBefore(endDay, 'day')) {
+        while (day.isBefore(endDay, "day")) {
             calendar.push(
-                Array(7).fill(0).map(() => day.add(1, 'day').clone())
+                Array(7)
+                    .fill(0)
+                    .map(() => day.add(1, "day").clone())
             );
         }
 
@@ -176,10 +175,10 @@ const Calendar = () => {
             if (auth.currentUser) {
                 const iconsRef = collection(db, "users", auth.currentUser.uid, "details");
                 const snapshot = await getDocs(iconsRef);
-                const iconsData = {};
-                snapshot.forEach(doc => {
+                const iconsData: { [key: string]: any } = {}; // ここで型を明示
+                snapshot.forEach((doc) => {
                     const data = doc.data();
-                    iconsData[doc.id] = data.selectedIcon; // Correct the field name to 'selectedIcon'
+                    iconsData[doc.id] = data.selectedIcon; // 正しくデータを格納
                 });
                 setIcons(iconsData);
             }
@@ -189,36 +188,36 @@ const Calendar = () => {
     }, [auth.currentUser]);
 
     const nextMonth = () => {
-        setCurrentMonth(currentMonth.clone().add(1, 'months'));
+        setCurrentMonth(currentMonth.clone().add(1, "months"));
     };
 
     const previousMonth = () => {
-        setCurrentMonth(currentMonth.clone().subtract(1, 'months'));
+        setCurrentMonth(currentMonth.clone().subtract(1, "months"));
     };
 
     const handleLogout = () => {
         signOut(auth)
             .then(() => {
-                navigate('/login');
+                navigate("/login");
             })
             .catch((error) => {
-                console.error('ログアウトエラー:', error);
+                console.error("ログアウトエラー:", error);
             });
     };
 
-    const handleDateClick = (day) => {
-        navigate('/details', { state: { date: day.format('YYYY-MM-DD') } });
+    const handleDateClick = (day: moment.Moment) => {
+        navigate("/details", { state: { date: day.format("YYYY-MM-DD") } });
     };
 
     return (
         <div className="flex w-full min-h-screen bg-white">
             <div className="w-1/4 min-h-full flex flex-col items-center bg-pink-100 relative justify-between">
-                <div className='w-full'>
-                    <div className='flex flex-col items-center mb-4 text-pink-400'>
+                <div className="w-full">
+                    <div className="flex flex-col items-center mb-4 text-pink-400">
                         <h1 className="text-4xl font-bold mt-8">おかしにっき</h1>
-                        <p className="text-2xl mt-8">やっほ〜 {user ? user.displayName : 'ゲスト'}！</p>
+                        <p className="text-2xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                     </div>
-                    <div className='flex flex-row-reverse items-end'>
+                    <div className="flex flex-row-reverse items-end">
                         <img src={candyImg} alt="Candy" style={{ width: "100px", position: "relative", bottom: "-80px" }} />
                     </div>
                     <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
@@ -261,37 +260,49 @@ const Calendar = () => {
                                 )}
                             </div>
                         </div>
-                        <div className='flex flex-col items-center w-full'>
+                        <div className="flex flex-col items-center w-full">
                             {isEditing ? (
-                                <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">ほぞん</button>
+                                <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                    ほぞん
+                                </button>
                             ) : (
-                                <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">へんしゅう</button>
+                                <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                    へんしゅう
+                                </button>
                             )}
                         </div>
                     </div>
-                    <div className='flex flex-row justify-between'>
+                    <div className="flex flex-row justify-between">
                         <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
                         <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-60px" }} />
                     </div>
                 </div>
-                <div className='flex flex-row justify-around w-full'>
-                    <div className='flex flex-col-reverse'>
-                        <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4">ログアウト</button>
+                <div className="flex flex-row justify-around w-full">
+                    <div className="flex flex-col-reverse">
+                        <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                            ログアウト
+                        </button>
                     </div>
                     <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4" style={{ width: "200px" }} />
                 </div>
             </div>
             <div className="flex flex-col items-center flex-grow p-8 min-h-full">
                 <div className="flex justify-between items-center w-full mb-16">
-                    <button onClick={previousMonth} className="text-xl font-semibold">⇐ まえ</button>
-                    <h2 className="text-4xl font-bold">{currentMonth.format('YYYY年 M月')}</h2>
-                    <button onClick={nextMonth} className="text-xl font-semibold">つぎ ⇒</button>
+                    <button onClick={previousMonth} className="text-xl font-semibold">
+                        ⇐ まえ
+                    </button>
+                    <h2 className="text-4xl font-bold">{currentMonth.format("YYYY年 M月")}</h2>
+                    <button onClick={nextMonth} className="text-xl font-semibold">
+                        つぎ ⇒
+                    </button>
                 </div>
                 <div className="grid grid-cols-7 gap-4 w-full">
                     {days.map((day, index) => (
                         <div
                             key={day}
-                            className={`text-center text-lg font-medium ${index === 0 ? 'text-red-500' : index === 6 ? 'text-blue-500' : 'text-gray-500'}`}
+                            className={`text-center text-lg font-medium ${
+                                index === 0 ? "text-red-500" : index === 6 ? "text-blue-500" : "text-gray-500"
+                            }`}
                         >
                             {day}
                         </div>
@@ -301,23 +312,24 @@ const Calendar = () => {
                     {calendar.map((week, weekIndex) => (
                         <React.Fragment key={weekIndex}>
                             {week.map((day) => {
-                                const dateKey = day.format('YYYY-MM-DD');
-                                const icon = icons[dateKey];
-                                const iconSrc = { Sweet, Hot, Sour, Salty, Cat }[icon];
-                                const isCurrentMonth = day.isSame(currentMonth, 'month');
+                                const dateKey = day.format("YYYY-MM-DD");
+                                const icon = icons[dateKey]; // アイコンのキーを取得
+                                const iconMapping: { [key: string]: string } = { Sweet, Hot, Sour, Salty, Cat };
+                                const iconSrc = iconMapping[icon]; // アイコンのソースをマッピングから取得
+
+                                const isCurrentMonth = day.isSame(currentMonth, "month");
 
                                 return (
-                                    <div key={dateKey} className="flex flex-col items-center justify-center"
-                                        onClick={() => handleDateClick(day)}>
+                                    <div key={dateKey} className="flex flex-col items-center justify-center" onClick={() => handleDateClick(day)}>
                                         {isCurrentMonth && (
                                             <>
                                                 {iconSrc ? (
-                                                    <img src={iconSrc} alt="Selected icon" style={{ width: '64px', marginBottom: '5px' }} />
+                                                    <img src={iconSrc} alt="Selected icon" style={{ width: "64px", marginBottom: "5px" }} />
                                                 ) : (
                                                     <div className={`w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center mb-2`}></div>
                                                 )}
-                                                <span className={`text-lg ${day.isSame(moment(), 'day') ? 'text-pink-500' : 'text-black'}`}>
-                                                    {day.date().toString().padStart(2, '0')}
+                                                <span className={`text-lg ${day.isSame(moment(), "day") ? "text-pink-500" : "text-black"}`}>
+                                                    {day.date().toString().padStart(2, "0")}
                                                 </span>
                                             </>
                                         )}
