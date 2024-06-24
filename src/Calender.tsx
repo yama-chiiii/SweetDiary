@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import UserContext from "./context/UseContext";
 import { db } from "./firebase-config";
 import ameImg from "./image/ame.png";
-import cakeDrinkImg from "./image/cake&drink.png";
 import cakeImg from "./image/cake.png";
 import candyImg from "./image/candy.png";
 import Cat from "./image/cat.png";
@@ -15,6 +14,7 @@ import Hot from "./image/hot.png";
 import Salty from "./image/salty.png";
 import Sour from "./image/sour.png";
 import Sweet from "./image/sweet.png";
+import "./index.css";
 
 moment.locale("ja");
 
@@ -275,9 +275,9 @@ const Calendar = () => {
             {showSideMenu ? (
                 <div className="w-full flex flex-col items-center bg-pink-100 relative justify-between sm:hidden">
                     <div className="w-full">
-                        <div className="flex flex-col items-center mb-4 text-pink-400">
+                        <div className="flex flex-col items-center sm:mb-164 text-pink-400">
                             <h1 className="text-2xl font-bold mt-8">おかしにっき</h1>
-                            <p className="text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
+                            <p className="text-xl my-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                         </div>
                         <div className="flex flex-col items-center">
                             <button onClick={() => setShowSideMenu(false)} className="bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">
@@ -285,7 +285,7 @@ const Calendar = () => {
                             </button>
                         </div>
                         <div className="flex flex-row-reverse items-end">
-                            <img src={candyImg} alt="Candy" className="w-10 sm:w-16" style={{ position: "relative", bottom: "-80px" }} />
+                            <img src={candyImg} alt="Candy" className="w-10 sm:w-40 candyImg" />
                         </div>
                         <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
                             <p className="text-3xl mb-12">今月のもくひょう！</p>
@@ -341,8 +341,8 @@ const Calendar = () => {
                             </div>
                         </div>
                         <div className="flex flex-row justify-between">
-                            <img src={cakeImg} alt="Cupcake" className="mt-4 w-10 sm:w-16" style={{ position: "relative", top: "-44px" }} />
-                            <img src={ameImg} alt="Ame" className="mt-4 w-10 sm:w-16" style={{ position: "relative", top: "-52px" }} />
+                            <img src={cakeImg} alt="Cupcake" className="mt-4 sm:w-10 cakeImg" />
+                            <img src={ameImg} alt="Ame" className="mt-4 sm:w-10 ameImg" />
                         </div>
                     </div>
                     <div className="flex flex-row justify-around w-full">
@@ -351,7 +351,7 @@ const Calendar = () => {
                                 ログアウト
                             </button>
                         </div>
-                        <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4 w-10 sm:w-20" />
+                        {/* <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4 w-10 sm:w-20" /> */}
                     </div>
                 </div>
             ) : (
@@ -428,7 +428,7 @@ const Calendar = () => {
                         <p className="text-2xl sm:text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                     </div>
                     <div className="flex flex-row items-end">
-                        <img src={candyImg} alt="Candy" className="w-10 sm:w-16" style={{ position: "relative", bottom: "-80px" }} />
+                        <img src={candyImg} alt="Candy" className="w-10 sm:w-28 candyImg" />
                     </div>
                     <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
                         <p className="text-3xl sm:text-xl mb-12">今月のもくひょう！</p>
@@ -484,17 +484,15 @@ const Calendar = () => {
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
-                        <img src={cakeImg} alt="Cupcake" className="mt-4 sm:w-10" style={{ position: "relative", top: "-44px" }} />
-                        <img src={ameImg} alt="Ame" className="mt-4 sm:w-10" style={{ position: "relative", top: "-52px" }} />
+                        <img src={cakeImg} alt="Cupcake" className="w-10 sm:w-24 cakeImg" />
+                        <img src={ameImg} alt="Ame" className="w-10 sm:w-28 ameImg" />
                     </div>
                 </div>
                 <div className="flex flex-row justify-around w-full">
-                    <div className="flex flex-col-reverse">
-                        <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4">
-                            ログアウト
-                        </button>
-                    </div>
-                    <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4 sm:w-20" />
+                    <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 pb-8 mb-12">
+                        ログアウト
+                    </button>
+                    {/* <img src={cakeDrinkImg} alt="Cake and Drink" className="w-10 sm:w-40 cakeDrinkImg" /> */}
                 </div>
             </div>
         </div>

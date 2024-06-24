@@ -1,3 +1,72 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* styles.css */
+@media (min-width: 640px) {
+    .candyImg {
+        width: 5rem;
+        bottom: 0px;
+        right: 20px;
+    }
+    .cakeImg {
+        width: 5rem;
+        bottom: 0px;
+        left: 20px;
+    }
+    .ameImg {
+        width: 5rem;
+        bottom: 0px;
+        right: 20px;
+    }
+    .cakeDrinkImg {
+        width: 5rem;
+        bottom: 20px;
+        right: 30px;
+    }
+}
+
+/* デフォルトスタイルをここに記述 */
+.candyImg {
+    width: 2.5rem;
+    position: absolute;
+    bottom: 640px;
+    right: 10px;
+}
+.cakeImg {
+    width: 2.5rem;
+    position: absolute;
+    bottom: 280px;
+    left: -24px;
+}
+.ameImg {
+    width: 2.5rem;
+    position: absolute;
+    bottom: 280px;
+    right: 10px;
+}
+.cakeDrinkImg {
+    width: 2.5rem;
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+}
+
+/* スマホサイズのスタイル */
+@media (max-width: 639px) {
+    .candyImg {
+        width: 5rem;
+        bottom: 420px;
+        right: 10px;
+    }
+    .cakeImg {
+        width: 5rem;
+        bottom: 36px;
+        left: -10px;
+    }
+    .ameImg {
+        width: 6rem;
+        bottom: 40px;
+        right: 10px;
+    }
+}
