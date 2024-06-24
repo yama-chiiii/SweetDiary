@@ -27,6 +27,9 @@ const Calendar = () => {
     const location = useLocation();
     const [icons, setIcons] = useState<{ [key: string]: any }>({});
     const [isEditing, setIsEditing] = useState(false);
+    const [showSideMenu, setShowSideMenu] = useState(false);
+    // const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
+
     const [goalData, setGoalData] = useState<{
         priceGoal: string;
         calorieGoal: string;
@@ -268,22 +271,171 @@ const Calendar = () => {
     };
 
     return (
-        <div className="flex w-full min-h-screen bg-white">
-            <div className="hidden sm:block w-1/4 min-h-full flex-col items-center bg-pink-100 relative justify-between">
+        <div className="flex flex-col sm:flex-row-reverse w-full min-h-screen bg-white">
+            {showSideMenu ? (
+                <div className="w-full flex flex-col items-center bg-pink-100 relative justify-between sm:hidden">
+                    <div className="w-full">
+                        <div className="flex flex-col items-center mb-4 text-pink-400">
+                            <h1 className="text-2xl font-bold mt-8">おかしにっき</h1>
+                            <p className="text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <button onClick={() => setShowSideMenu(false)} className="bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">
+                                かれんだー
+                            </button>
+                        </div>
+                        <div className="flex flex-row-reverse items-end">
+                            <img src={candyImg} alt="Candy" className="w-10 sm:w-16" style={{ position: "relative", bottom: "-80px" }} />
+                        </div>
+                        <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
+                            <p className="text-3xl mb-12">今月のもくひょう！</p>
+                            <div className="w-full mb-6">
+                                <p className="text-xl mr-4 whitespace-nowrap">かかく</p>
+                                <div className="flex items-center">
+                                    <p className="text-lg">{totalData.totalPrice} 円</p>
+                                    <span className="mx-2">/</span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="priceGoal"
+                                            value={goalData.priceGoal}
+                                            onChange={handleGoalInputChange}
+                                            className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                            placeholder="目標かかく"
+                                        />
+                                    ) : (
+                                        <p className="text-lg">{goalData.priceGoal} 円</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="w-full mb-6">
+                                <p className="text-xl mr-4 whitespace-nowrap">かろりー</p>
+                                <div className="flex items-center">
+                                    <p className="text-lg">{totalData.totalCalorie} kcal</p>
+                                    <span className="mx-2">/</span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="calorieGoal"
+                                            value={goalData.calorieGoal}
+                                            onChange={handleGoalInputChange}
+                                            className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                            placeholder="目標かろりー"
+                                        />
+                                    ) : (
+                                        <p className="text-lg">{goalData.calorieGoal} kcal</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center w-full">
+                                {isEditing ? (
+                                    <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                        ほぞん
+                                    </button>
+                                ) : (
+                                    <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                        へんしゅう
+                                    </button>
+                                )}
+                                <p className="text-xs text-red-500">※月に1回しかへんしゅうできないからちゅうい！</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-row justify-between">
+                            <img src={cakeImg} alt="Cupcake" className="mt-4 w-10 sm:w-16" style={{ position: "relative", top: "-44px" }} />
+                            <img src={ameImg} alt="Ame" className="mt-4 w-10 sm:w-16" style={{ position: "relative", top: "-52px" }} />
+                        </div>
+                    </div>
+                    <div className="flex flex-row justify-around w-full">
+                        <div className="flex flex-col-reverse">
+                            <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4 pb-8">
+                                ログアウト
+                            </button>
+                        </div>
+                        <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4 w-10 sm:w-20" />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col items-center p-8 min-h-full sm:w-3/4 sm:flex-grow">
+                    <div className="flex justify-between items-center w-full mb-4">
+                        <button onClick={previousMonth} className="sm:text-xl text-md font-semibold">
+                            ⇐ まえ
+                        </button>
+                        <h2 className="sm:text-4xl text-lg font-bold">{currentMonth.format("YYYY年 M月")}</h2>
+                        <button onClick={nextMonth} className="sm:text-xl text-md font-semibold">
+                            つぎ ⇒
+                        </button>
+                    </div>
+                    <button className="sm:hidden bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4" onClick={() => setShowSideMenu(true)}>
+                        もくひょう
+                    </button>
+                    <div className="grid grid-cols-7 gap-4 w-full">
+                        {days.map((day, index) => (
+                            <div
+                                key={index}
+                                className={`text-center sm:text-lg text-sm font-medium ${
+                                    index === 0 ? "text-red-500" : index === 6 ? "text-blue-500" : "text-gray-500"
+                                }`}
+                            >
+                                {day}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-7 gap-4 w-full mt-4 pb-4 flex-grow">
+                        {calendar.map((week, weekIndex) => (
+                            <React.Fragment key={weekIndex}>
+                                {week.map((day) => {
+                                    const dateKey = day.format("YYYY-MM-DD");
+                                    const icon = icons[dateKey];
+                                    const iconMapping: { [key: string]: string } = { Sweet, Hot, Sour, Salty, Cat };
+                                    const iconSrc = iconMapping[icon];
+                                    const isToday = day.isSame(moment(), "day");
+                                    const dayClasses = generateDayClass(day);
+                                    const isCurrentMonth = day.isSame(currentMonth, "month");
+
+                                    return (
+                                        <div key={dateKey} className={dayClasses} onClick={() => handleDateClick(day)}>
+                                            {isCurrentMonth && (
+                                                <>
+                                                    {iconSrc ? (
+                                                        <img
+                                                            src={iconSrc}
+                                                            alt="Selected icon"
+                                                            className="w-8 sm:w-16 h-8 sm:h-16"
+                                                            style={{ width: "64px", marginBottom: "5px" }}
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className={`w-8 h-8 sm:w-16 sm:h-16 bg-pink-200 rounded-full flex items-center justify-center mb-2`}
+                                                        ></div>
+                                                    )}
+                                                    <span className={`${isToday ? "bg-pink-300 rounded-full px-1 text-white" : ""}`}>
+                                                        {day.date().toString().padStart(2, "0")}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                </div>
+            )}
+            <div className="hidden sm:flex sm:flex-col sm:w-1/4 sm:min-h-screen sm:bg-pink-100 sm:relative sm:justify-between">
                 <div className="w-full">
                     <div className="flex flex-col items-center mb-4 text-pink-400">
-                        <h1 className="text-4xl font-bold mt-8">おかしにっき</h1>
-                        <p className="text-2xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
+                        <h1 className="sm:text-2xl lg:text-3xl font-bold mt-8">おかしにっき</h1>
+                        <p className="text-2xl sm:text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                     </div>
-                    <div className="flex flex-row-reverse items-end">
-                        <img src={candyImg} alt="Candy" style={{ width: "100px", position: "relative", bottom: "-80px" }} />
+                    <div className="flex flex-row items-end">
+                        <img src={candyImg} alt="Candy" className="w-10 sm:w-16" style={{ position: "relative", bottom: "-80px" }} />
                     </div>
                     <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
-                        <p className="text-3xl mb-12">今月のもくひょう！</p>
+                        <p className="text-3xl sm:text-xl mb-12">今月のもくひょう！</p>
                         <div className="w-full mb-6">
-                            <p className="text-xl mr-4 whitespace-nowrap">かかく</p>
+                            <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かかく</p>
                             <div className="flex items-center">
-                                <p className="text-lg">{totalData.totalPrice} 円</p>
+                                <p className="text-lg sm:text-sm">{totalData.totalPrice} 円</p>
                                 <span className="mx-2">/</span>
                                 {isEditing ? (
                                     <input
@@ -291,18 +443,18 @@ const Calendar = () => {
                                         name="priceGoal"
                                         value={goalData.priceGoal}
                                         onChange={handleGoalInputChange}
-                                        className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                        className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
                                         placeholder="目標かかく"
                                     />
                                 ) : (
-                                    <p className="text-lg">{goalData.priceGoal} 円</p>
+                                    <p className="text-lg sm:text-sm">{goalData.priceGoal} 円</p>
                                 )}
                             </div>
                         </div>
                         <div className="w-full mb-6">
-                            <p className="text-xl mr-4 whitespace-nowrap">かろりー</p>
+                            <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かろりー</p>
                             <div className="flex items-center">
-                                <p className="text-lg">{totalData.totalCalorie} kcal</p>
+                                <p className="text-lg sm:text-sm">{totalData.totalCalorie} kcal</p>
                                 <span className="mx-2">/</span>
                                 {isEditing ? (
                                     <input
@@ -310,11 +462,11 @@ const Calendar = () => {
                                         name="calorieGoal"
                                         value={goalData.calorieGoal}
                                         onChange={handleGoalInputChange}
-                                        className="w-1/3 outline-none text-lg border border-black rounded no-spin"
+                                        className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
                                         placeholder="目標かろりー"
                                     />
                                 ) : (
-                                    <p className="text-lg">{goalData.calorieGoal} kcal</p>
+                                    <p className="text-lg sm:text-sm">{goalData.calorieGoal} kcal</p>
                                 )}
                             </div>
                         </div>
@@ -332,8 +484,8 @@ const Calendar = () => {
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
-                        <img src={cakeImg} alt="Cupcake" className="mt-4" style={{ width: "100px", position: "relative", top: "-44px" }} />
-                        <img src={ameImg} alt="Ame" className="mt-4" style={{ width: "100px", position: "relative", top: "-52px" }} />
+                        <img src={cakeImg} alt="Cupcake" className="mt-4 sm:w-10" style={{ position: "relative", top: "-44px" }} />
+                        <img src={ameImg} alt="Ame" className="mt-4 sm:w-10" style={{ position: "relative", top: "-52px" }} />
                     </div>
                 </div>
                 <div className="flex flex-row justify-around w-full">
@@ -342,74 +494,12 @@ const Calendar = () => {
                             ログアウト
                         </button>
                     </div>
-                    <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4" style={{ width: "200px" }} />
-                </div>
-            </div>
-            <div className="flex flex-col items-center flex-grow p-8 min-h-full">
-                <div className="flex justify-between items-center w-full mb-4">
-                    <button onClick={previousMonth} className="sm:text-xl text-md font-semibold">
-                        ⇐ まえ
-                    </button>
-                    <h2 className="sm:text-4xl text-lg font-bold">{currentMonth.format("YYYY年 M月")}</h2>
-                    <button onClick={nextMonth} className="sm:text-xl text-md font-semibold">
-                        つぎ ⇒
-                    </button>
-                </div>
-                <button className="sm:hidden bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">もくひょう</button>
-                <div className="grid grid-cols-7 gap-4 w-full">
-                    {days.map((day, index) => (
-                        <div
-                            key={index}
-                            className={`text-center sm:text-lg text-sm font-medium ${
-                                index === 0 ? "text-red-500" : index === 6 ? "text-blue-500" : "text-gray-500"
-                            }`}
-                        >
-                            {day}
-                        </div>
-                    ))}
-                </div>
-                <div className="grid grid-cols-7 gap-4 w-full mt-4 pb-4 flex-grow">
-                    {calendar.map((week, weekIndex) => (
-                        <React.Fragment key={weekIndex}>
-                            {week.map((day) => {
-                                const dateKey = day.format("YYYY-MM-DD");
-                                const icon = icons[dateKey];
-                                const iconMapping: { [key: string]: string } = { Sweet, Hot, Sour, Salty, Cat };
-                                const iconSrc = iconMapping[icon];
-                                const isToday = day.isSame(moment(), "day");
-                                const dayClasses = generateDayClass(day);
-                                const isCurrentMonth = day.isSame(currentMonth, "month");
-
-                                return (
-                                    <div key={dateKey} className={dayClasses} onClick={() => handleDateClick(day)}>
-                                        {isCurrentMonth && (
-                                            <>
-                                                {iconSrc ? (
-                                                    <img
-                                                        src={iconSrc}
-                                                        alt="Selected icon"
-                                                        className="w-8 h-8 sm:w-16 sm:h-16"
-                                                        style={{ width: "64px", marginBottom: "5px" }}
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className={`w-8 h-8 sm:w-16 sm:h-16 bg-pink-200 rounded-full flex items-center justify-center mb-2`}
-                                                    ></div>
-                                                )}
-                                                <span className={`${isToday ? "bg-pink-300 rounded-full px-1 text-white" : ""}`}>
-                                                    {day.date().toString().padStart(2, "0")}
-                                                </span>
-                                            </>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </React.Fragment>
-                    ))}
+                    <img src={cakeDrinkImg} alt="Cake and Drink" className="mb-4 sm:w-20" />
                 </div>
             </div>
         </div>
     );
 };
+
 
 export default Calendar;
