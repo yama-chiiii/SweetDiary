@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useIcons } from "./context/IconContext";
 import { auth, db } from "./firebase-config";
@@ -59,7 +59,7 @@ const DetailsForm = () => {
         fetchData();
     }, [date, navigate]);
 
-    const handleIconSelect = (icon: React.SetStateAction<string>) => {
+    const handleIconSelect = (icon: SetStateAction<string>) => {
         if (isEditing) {
             setIconForDate(date, icon);
             setSelectedIcon(icon);
@@ -130,78 +130,78 @@ const DetailsForm = () => {
 
     return (
         <div className="w-full min-h-screen flex justify-center items-center bg-pink-100">
-            <div className="flex flex-col items-center bg-white h-full w-3/4">
-                <p className="pt-12 pb-8 text-4xl">{formattedDate}</p>
-                <div className="flex flex-col items-center w-3/4 rounded bg-pink-100 mb-12">
-                    <p className="my-4 text-xl">きょうのおかしはどんなあじ？</p>
-                    <div className="w-3/4 flex justify-between pb-4">
+            <div className="flex flex-col items-center bg-white h-full w-full sm:w-3/4">
+                <p className="pt-12 pb-8 text-2xl sm:text-4xl">{formattedDate}</p>
+                <div className="flex flex-col items-center w-full sm:w-3/4 rounded bg-pink-100 mb-12">
+                    <p className="my-4 text-lg sm:text-xl">きょうのおかしはどんなあじ？</p>
+                    <div className="w-full sm:w-3/4 flex justify-between pb-4">
                         {Object.entries(iconMapping).map(([iconType, { image, label }]) => (
                             <div
                                 key={iconType}
                                 className={`flex flex-col items-center p-2 ${iconClass(iconType)}`}
                                 onClick={() => handleIconSelect(iconType)}
                             >
-                                <img src={image} alt={`${label} icon`} style={{ width: "100px" }} />
+                                <img src={image} alt={`${label} icon`} className="w-16 sm:w-24" />
                                 <p>{label}</p>
                             </div>
                         ))}
                     </div>
 
-                    <div className="flex flex-row items-center">
-                        <p className="py-8 text-2xl whitespace-nowrap">お菓子名：</p>
+                    <div className="flex flex-row items-center w-full px-4 sm:px-0">
+                        <p className="py-8 text-lg sm:text-2xl whitespace-nowrap">お菓子名：</p>
                         <input
                             type="text"
                             id="name"
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className={`h-12 w-full px-4  border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
+                            className={`h-12 w-full px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             }`}
                             disabled={!isEditing}
                         />
                     </div>
                 </div>
-                <div className="flex flex-col w-3/4 rounded bg-pink-100 pl-16 mb-12 pt-4">
-                    <div className="flex flex-row items-center">
-                        <p className="py-4 text-2xl">かろりー：</p>
+                <div className="flex flex-col w-full sm:w-3/4 rounded bg-pink-100 pl-8 sm:pl-16 mb-12 pt-4">
+                    <div className="flex flex-row items-center w-full px-4 sm:px-0">
+                        <p className="py-4 text-lg sm:text-2xl">かろりー：</p>
                         <input
                             type="number"
                             id="cal"
                             name="cal"
                             value={formData.cal}
                             onChange={handleInputChange}
-                            className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
+                            className={`h-12 w-1/3 sm:w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             } no-spin`}
                             disabled={!isEditing}
                         />
-                        <p className="py-4 text-sm">kcal</p>
+                        <p className="py-4 text-sm sm:text-lg">kcal</p>
                     </div>
-                    <div className="flex flex-row items-center">
-                        <p className="py-4 pl-6 text-2xl">かかく：</p>
+                    <div className="flex flex-row items-center w-full px-4 sm:px-0">
+                        <p className="py-4 pl-2 sm:pl-6 text-lg sm:text-2xl">かかく：</p>
                         <input
                             type="number"
                             id="price"
                             name="price"
                             value={formData.price}
                             onChange={handleInputChange}
-                            className={`h-12 w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
+                            className={`h-12 w-1/3 sm:w-1/5 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             } no-spin`}
                             disabled={!isEditing}
                         />
-                        <p className="py-4 text-sm">えん</p>
+                        <p className="py-4 text-sm sm:text-lg">えん</p>
                     </div>
-                    <div className="flex flex-row items-center">
-                        <p className="py-4 text-2xl">かんそう：</p>
+                    <div className="flex flex-row items-center w-full px-4 sm:px-0">
+                        <p className="py-4 text-lg sm:text-2xl">かんそう：</p>
                         <input
                             type="text"
                             id="thoughts"
                             name="thoughts"
                             value={formData.thoughts}
                             onChange={handleInputChange}
-                            className={`h-12 w-2/3 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-xl ${
+                            className={`h-12 w-2/3 px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             }`}
                             disabled={!isEditing}
@@ -209,16 +209,16 @@ const DetailsForm = () => {
                     </div>
                     <div className="pb-4" />
                 </div>
-                <div className="w-3/4 flex justify-around pb-12">
-                    <button onClick={handleBack} className="w-40 h-12 rounded-md bg-pink-100 text-2xl">
+                <div className="w-full sm:w-3/4 flex justify-around pb-12">
+                    <button onClick={handleBack} className="w-24 h-10 sm:w-40 sm:h-12 rounded-md bg-pink-100 text-lg sm:text-2xl">
                         もどる
                     </button>
                     {isEditing ? (
-                        <button onClick={handleSave} className="w-40 h-12 rounded-md bg-pink-100 text-2xl">
+                        <button onClick={handleSave} className="w-24 h-10 sm:w-40 sm:h-12 rounded-md bg-pink-100 text-lg sm:text-2xl">
                             ほぞん
                         </button>
                     ) : (
-                        <button onClick={handleEdit} className="w-40 h-12 rounded-md bg-pink-100 text-2xl">
+                        <button onClick={handleEdit} className="w-24 h-10 sm:w-40 sm:h-12 rounded-md bg-pink-100 text-lg sm:text-2xl">
                             へんしゅう
                         </button>
                     )}
