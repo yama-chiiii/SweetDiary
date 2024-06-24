@@ -269,7 +269,7 @@ const Calendar = () => {
 
     return (
         <div className="flex w-full min-h-screen bg-white">
-            <div className="w-1/4 min-h-full flex flex-col items-center bg-pink-100 relative justify-between">
+            <div className="hidden sm:block w-1/4 min-h-full flex-col items-center bg-pink-100 relative justify-between">
                 <div className="w-full">
                     <div className="flex flex-col items-center mb-4 text-pink-400">
                         <h1 className="text-4xl font-bold mt-8">おかしにっき</h1>
@@ -346,20 +346,21 @@ const Calendar = () => {
                 </div>
             </div>
             <div className="flex flex-col items-center flex-grow p-8 min-h-full">
-                <div className="flex justify-between items-center w-full mb-16">
-                    <button onClick={previousMonth} className="text-xl font-semibold">
+                <div className="flex justify-between items-center w-full mb-4">
+                    <button onClick={previousMonth} className="sm:text-xl text-md font-semibold">
                         ⇐ まえ
                     </button>
-                    <h2 className="text-4xl font-bold">{currentMonth.format("YYYY年 M月")}</h2>
-                    <button onClick={nextMonth} className="text-xl font-semibold">
+                    <h2 className="sm:text-4xl text-lg font-bold">{currentMonth.format("YYYY年 M月")}</h2>
+                    <button onClick={nextMonth} className="sm:text-xl text-md font-semibold">
                         つぎ ⇒
                     </button>
                 </div>
+                <button className="sm:hidden bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">もくひょう</button>
                 <div className="grid grid-cols-7 gap-4 w-full">
                     {days.map((day, index) => (
                         <div
                             key={index}
-                            className={`text-center text-lg font-medium ${
+                            className={`text-center sm:text-lg text-sm font-medium ${
                                 index === 0 ? "text-red-500" : index === 6 ? "text-blue-500" : "text-gray-500"
                             }`}
                         >
@@ -384,9 +385,16 @@ const Calendar = () => {
                                         {isCurrentMonth && (
                                             <>
                                                 {iconSrc ? (
-                                                    <img src={iconSrc} alt="Selected icon" style={{ width: "64px", marginBottom: "5px" }} />
+                                                    <img
+                                                        src={iconSrc}
+                                                        alt="Selected icon"
+                                                        className="w-8 h-8 sm:w-16 sm:h-16"
+                                                        style={{ width: "64px", marginBottom: "5px" }}
+                                                    />
                                                 ) : (
-                                                    <div className={`w-14 h-14 bg-pink-200 rounded-full flex items-center justify-center mb-2`}></div>
+                                                    <div
+                                                        className={`w-8 h-8 sm:w-16 sm:h-16 bg-pink-200 rounded-full flex items-center justify-center mb-2`}
+                                                    ></div>
                                                 )}
                                                 <span className={`${isToday ? "bg-pink-300 rounded-full px-1 text-white" : ""}`}>
                                                     {day.date().toString().padStart(2, "0")}
