@@ -6,6 +6,7 @@ import logo from "./image/logo.png"; // 画像ファイルをインポート
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
     const navigate = useNavigate();
     const userAgent = navigator.userAgent.toLowerCase();
 
@@ -16,7 +17,6 @@ const Login = () => {
                 auth.onAuthStateChanged((user) => {
                     if (user) {
                         console.log("ログイン成功:", user);
-                        localStorage.setItem("user", JSON.stringify(user)); // ローカルストレージに保存
                         navigate("/home");
                     } else {
                         console.log("ユーザーが見つかりません。");
@@ -43,16 +43,34 @@ const Login = () => {
         const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider).catch((error) => {
             console.error("ポップアップ中のエラー:", error);
-            alert("ログインに失敗しました。ポップアップブロッカーを確認してください。");
             setLoading(false);
         });
     };
 
+    useEffect(() => {
+        if (/Android|iPhone/i.test(navigator.userAgent)) {
+            setShowWarning(true);
+        }
+    }, []);
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-pink-100 font-sans">
+            {showWarning && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+                        <h2 className="text-2xl font-bold mb-4 text-pink-500">ご注意ください</h2>
+                        <p className="mb-4 text-gray-700">
+                            外部ブラウザでないとログインがうまくいかない場合があります。ChromeやSafariを使用してください。
+                        </p>
+                        <button onClick={() => setShowWarning(false)} className="px-4 py-2 bg-pink-100 text-white rounded-lg hover:bg-pink-200">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className="flex flex-col items-center justify-center bg-white w-full sm:w-3/4 lg:w-1/2 h-screen rounded-lg shadow-lg text-center">
                 {loading ? (
-                    <div className="loader" style={{ color: "pink" }}>
+                    <div className="loader">
                         <div className="wave"></div>
                         <div className="wave"></div>
                         <div className="wave"></div>
