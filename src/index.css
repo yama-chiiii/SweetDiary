@@ -2,29 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ローディングアニメーションのスタイル */
-.loader {
-    border-top-color: #3498db;
-    -webkit-animation: spinner 0.6s linear infinite;
-    animation: spinner 0.6s linear infinite;
+/* App.css */
+.loading-spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #ff69b4; /* ピンク色 */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
   }
 
-  @-webkit-keyframes spinner {
-    0% {
-      -webkit-transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(360deg);
-    }
-  }
-
-  @keyframes spinner {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
 

@@ -1,6 +1,7 @@
 import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./App.css"; // ここで上記CSSをインポート
 import { auth } from "./firebase-config";
 import logo from "./image/logo.png"; // 画像ファイルをインポート
 
@@ -53,9 +54,7 @@ const Login = () => {
                 <img src={logo} alt="Logo" className="mx-auto mb-24 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96" />
                 <p className="text-lg pb-8 text-pink-400">～おかし好きのためのかわいい記録帳♡～</p>
                 {loading ? (
-                    <div className="flex items-center justify-center">
-                        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
-                    </div>
+                    <div className="loading-spinner"></div>
                 ) : (
                     <button
                         onClick={() => {
