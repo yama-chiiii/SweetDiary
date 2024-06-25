@@ -1,7 +1,6 @@
 import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./App.css"; // ここで上記CSSをインポート
 import { auth } from "./firebase-config";
 import logo from "./image/logo.png"; // 画像ファイルをインポート
 
@@ -12,8 +11,8 @@ const Login = () => {
 
     useEffect(() => {
         const fetchRedirectResult = async () => {
+            setLoading(true);
             console.log("Fetching redirect result...");
-            setLoading(true); // ローディングを開始
             try {
                 const result = await getRedirectResult(auth);
                 if (result && result.user) {
@@ -26,7 +25,7 @@ const Login = () => {
             } catch (error) {
                 console.error("ログインエラー:", error);
             } finally {
-                setLoading(false); // ローディングを終了
+                setLoading(false);
             }
         };
 
@@ -40,35 +39,41 @@ const Login = () => {
 
     const signInWithGoogle = () => {
         console.log("Sign in with Google triggered");
-        setLoading(true); // ローディングを開始
+        setLoading(true);
         const provider = new GoogleAuthProvider();
         signInWithRedirect(auth, provider).catch((error) => {
             console.error("リダイレクト中のエラー:", error);
-            setLoading(false); // エラーが発生した場合、ローディングを終了
+            setLoading(false);
         });
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-pink-100 font-sans">
             <div className="flex flex-col items-center justify-center bg-white w-full sm:w-3/4 lg:w-1/2 h-screen rounded-lg shadow-lg text-center">
-                <img src={logo} alt="Logo" className="mx-auto mb-24 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96" />
-                <p className="text-lg pb-8 text-pink-400">～おかし好きのためのかわいい記録帳♡～</p>
                 {loading ? (
-                    <div className="loading-spinner"></div>
+                    <div className="loader">
+                        <div className="wave"></div>
+                        <div className="wave"></div>
+                        <div className="wave"></div>
+                    </div>
                 ) : (
-                    <button
-                        onClick={() => {
-                            console.log("Login button clicked");
-                            if (userAgent.includes("line")) {
-                                alert("LINE内ブラウザではGoogleログインがサポートされていません。外部ブラウザで開いてください。");
-                            } else {
-                                signInWithGoogle();
-                            }
-                        }}
-                        className="px-12 py-6 bg-pink-100 text-white text-xl rounded-lg hover:bg-pink-light"
-                    >
-                        ろぐいん！
-                    </button>
+                    <>
+                        <img src={logo} alt="Logo" className="mx-auto mb-24 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96" />
+                        <p className="text-lg pb-8 text-pink-400">～おかし好きのためのかわいい記録帳♡～</p>
+                        <button
+                            onClick={() => {
+                                console.log("Login button clicked");
+                                if (userAgent.includes("line")) {
+                                    alert("LINE内ブラウザではGoogleログインがサポートされていません。外部ブラウザで開いてください。");
+                                } else {
+                                    signInWithGoogle();
+                                }
+                            }}
+                            className="px-12 py-6 bg-pink-100 text-white text-xl rounded-lg hover:bg-pink-light"
+                        >
+                            ろぐいん！
+                        </button>
+                    </>
                 )}
             </div>
         </div>
