@@ -3,14 +3,13 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'; // Firestore用のインポートを追加
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD8Xzt4Xesf2KT5jYMp-8wPzvo3nJPRzKU",
-    authDomain: "sweet-diary-e0e3b.firebaseapp.com",
-    projectId: "sweet-diary-e0e3b",
-    storageBucket: "sweet-diary-e0e3b.appspot.com",
-    messagingSenderId: "43675353573",
-    appId: "1:43675353573:web:e0e3b"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
-
 
 // Firebaseを初期化
 const app = initializeApp(firebaseConfig);
