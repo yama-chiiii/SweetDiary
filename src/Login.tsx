@@ -17,6 +17,8 @@ const Login = () => {
                     if (result) {
                         console.log("ログイン成功:", result.user);
                         navigate("/home");
+                    } else {
+                        console.log("リダイレクト結果が取得できませんでした。");
                     }
                 })
                 .catch((error) => {
