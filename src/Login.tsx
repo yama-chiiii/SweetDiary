@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "./firebase-config";
@@ -10,18 +10,17 @@ const Login = () => {
     const userAgent = navigator.userAgent.toLowerCase();
 
     useEffect(() => {
-        const fetchRedirectResult = async () => {
+        const checkLoginState = async () => {
             setLoading(true);
-            console.log("Fetching redirect result...");
             try {
-                const result = await getRedirectResult(auth);
-                if (result && result.user) {
-                    console.log("ログイン成功:", result.user);
-                    sessionStorage.clear(); // セッションストレージをクリア
-                    navigate("/home");
-                } else {
-                    console.log("リダイレクト結果が取得できませんでした。");
-                }
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        console.log("ログイン成功:", user);
+                        navigate("/home");
+                    } else {
+                        console.log("ユーザーが見つかりません。");
+                    }
+                });
             } catch (error) {
                 console.error("ログインエラー:", error);
             } finally {
@@ -30,10 +29,10 @@ const Login = () => {
         };
 
         if (!userAgent.includes("line")) {
-            console.log("Not in LINE browser, fetching redirect result");
-            fetchRedirectResult();
+            console.log("Not in LINE browser, checking login state");
+            checkLoginState();
         } else {
-            console.log("In LINE browser, skip fetching redirect result");
+            console.log("In LINE browser, skip login state check");
         }
     }, [userAgent, navigate]);
 
@@ -41,8 +40,8 @@ const Login = () => {
         console.log("Sign in with Google triggered");
         setLoading(true);
         const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider).catch((error) => {
-            console.error("リダイレクト中のエラー:", error);
+        signInWithPopup(auth, provider).catch((error) => {
+            console.error("ポップアップ中のエラー:", error);
             setLoading(false);
         });
     };
