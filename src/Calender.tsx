@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import moment, { Moment } from "moment";
 import "moment/locale/ja";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserContext from "./context/UseContext";
 import { db } from "./firebase-config";
@@ -29,7 +29,7 @@ const Calendar = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [showSideMenu, setShowSideMenu] = useState(false);
 
-    const calculateRowCount = () => {
+    const calculateRowCount = useCallback(() => {
         const startDay = currentMonth.clone().startOf("month").startOf("week");
         const endDay = currentMonth.clone().endOf("month").endOf("week");
         const day = startDay.clone().subtract(1, "day");
@@ -41,13 +41,13 @@ const Calendar = () => {
         }
 
         return rowCount;
-    };
+    }, [currentMonth]);
 
     const [rowCount, setRowCount] = useState(calculateRowCount());
 
     useEffect(() => {
         setRowCount(calculateRowCount());
-    }, [currentMonth]);
+    }, [currentMonth, calculateRowCount]);
 
     const [goalData, setGoalData] = useState<{
         priceGoal: string;
