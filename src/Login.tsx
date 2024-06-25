@@ -10,10 +10,12 @@ const Login = () => {
 
     useEffect(() => {
         const fetchRedirectResult = async () => {
+            console.log("Fetching redirect result...");
             try {
                 const result = await getRedirectResult(auth);
                 if (result && result.user) {
                     console.log("ログイン成功:", result.user);
+                    sessionStorage.clear(); // セッションストレージをクリア
                     navigate("/home");
                 } else {
                     console.log("リダイレクト結果が取得できませんでした。");
@@ -24,11 +26,15 @@ const Login = () => {
         };
 
         if (!userAgent.includes("line")) {
+            console.log("Not in LINE browser, fetching redirect result");
             fetchRedirectResult();
+        } else {
+            console.log("In LINE browser, skip fetching redirect result");
         }
     }, [userAgent, navigate]);
 
     const signInWithGoogle = () => {
+        console.log("Sign in with Google triggered");
         const provider = new GoogleAuthProvider();
         signInWithRedirect(auth, provider).catch((error) => {
             console.error("リダイレクト中のエラー:", error);
@@ -42,6 +48,7 @@ const Login = () => {
                 <p className="text-lg pb-8 text-pink-400">～おかし好きのためのかわいい記録帳♡～</p>
                 <button
                     onClick={() => {
+                        console.log("Login button clicked");
                         if (userAgent.includes("line")) {
                             alert("LINE内ブラウザではGoogleログインがサポートされていません。外部ブラウザで開いてください。");
                         } else {
