@@ -9,21 +9,23 @@ const Login = () => {
     const userAgent = navigator.userAgent.toLowerCase();
 
     useEffect(() => {
-        if (userAgent.includes("line")) {
-            alert("LINE内ブラウザではGoogleログインがサポートされていません。外部ブラウザで開いてください。");
-        } else {
-            getRedirectResult(auth)
-                .then((result) => {
-                    if (result) {
-                        console.log("ログイン成功:", result.user);
-                        navigate("/home");
-                    } else {
-                        console.log("リダイレクト結果が取得できませんでした。");
-                    }
-                })
-                .catch((error) => {
-                    console.error("ログインエラー:", error);
-                });
+        const fetchRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result && result.user) {
+                    console.log("ログイン成功:", result.user);
+                    sessionStorage.setItem("user", JSON.stringify(result.user));
+                    navigate("/home");
+                } else {
+                    console.log("リダイレクト結果が取得できませんでした。");
+                }
+            } catch (error) {
+                console.error("ログインエラー:", error);
+            }
+        };
+
+        if (!userAgent.includes("line")) {
+            fetchRedirectResult();
         }
     }, [userAgent, navigate]);
 
