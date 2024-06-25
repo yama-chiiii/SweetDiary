@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import moment from "moment";
 import { SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ const DetailsForm = () => {
     const formattedDate = moment(date).format("MがつDにち");
     const { setIconForDate } = useIcons();
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState("");
     const [formData, setFormData] = useState({
         name: "",
@@ -114,6 +115,22 @@ const DetailsForm = () => {
         }
     };
 
+    const handleDelete = async () => {
+        if (!auth.currentUser) {
+            alert("ログインされていません。");
+            return;
+        }
+
+        const docRef = doc(db, "users", auth.currentUser.uid, "details", date);
+
+        try {
+            await deleteDoc(docRef);
+            navigate("/home");
+        } catch (error) {
+            alert("削除に失敗しました。エラーを確認してください。");
+        }
+    };
+
     useEffect(() => {
         console.log("Editing State changed:", isEditing);
     }, [isEditing]);
@@ -129,9 +146,16 @@ const DetailsForm = () => {
     const iconClass = (icon: string) => (isEditing && selectedIcon === icon ? "bg-pink-200" : "");
 
     return (
-        <div className="w-full min-h-screen flex justify-center items-center bg-pink-100">
-            <div className="flex flex-col items-center bg-white h-full w-full sm:w-3/4">
+        <div className="w-full min-h-screen flex justify-center items-center bg-pink-100 relative">
+            <div className="flex flex-col items-center bg-white h-full w-full sm:w-3/4 relative z-10">
                 <p className="pt-12 pb-8 text-2xl sm:text-4xl">{formattedDate}</p>
+                {isEditing && (
+                    <div className="w-full flex flex-row-reverse px-2 sm:pr-36">
+                        <button onClick={() => setShowDeleteConfirmation(true)} className="bg-red-500 text-white rounded px-4 py-2 my-4">
+                            でーたさくじょ
+                        </button>
+                    </div>
+                )}
                 <div className="flex flex-col items-center w-full sm:w-3/4 rounded bg-pink-100 mb-12">
                     <p className="my-4 text-lg sm:text-xl">きょうのおかしはどんなあじ？</p>
                     <div className="w-full sm:w-3/4 flex justify-between pb-4">
@@ -148,14 +172,14 @@ const DetailsForm = () => {
                     </div>
 
                     <div className="flex flex-row items-center w-full px-4 sm:px-0">
-                        <p className="py-8 text-lg sm:text-2xl whitespace-nowrap">お菓子名：</p>
+                        <p className="py-8 sm:pl-16 text-lg sm:text-2xl whitespace-nowrap">お菓子名：</p>
                         <input
                             type="text"
                             id="name"
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className={`h-12 w-full px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
+                            className={`h-12 w-full px-4 sm:px-4 sm:mx-8 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             }`}
                             disabled={!isEditing}
@@ -207,6 +231,7 @@ const DetailsForm = () => {
                             disabled={!isEditing}
                         />
                     </div>
+
                     <div className="pb-4" />
                 </div>
                 <div className="w-full sm:w-3/4 flex justify-around pb-12">
@@ -224,6 +249,27 @@ const DetailsForm = () => {
                     )}
                 </div>
             </div>
+            {showDeleteConfirmation && (
+                <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-20">
+                    <div className="bg-white p-8 rounded shadow-lg text-center">
+                        <p className="text-lg mb-4">ほんとうにけすの？</p>
+                        <div className="flex justify-around">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteConfirmation(false);
+                                    setIsEditing(false);
+                                }}
+                                className="bg-gray-300 text-black rounded px-4 py-2 mx-2"
+                            >
+                                キャンセル
+                            </button>
+                            <button onClick={handleDelete} className="bg-red-500 text-white rounded px-4 py-2 mx-2">
+                                けす
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

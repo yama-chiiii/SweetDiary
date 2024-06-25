@@ -290,27 +290,23 @@ const Calendar = () => {
     };
 
     return (
-        <div className="flex flex-col sm:flex-row-reverse w-full min-h-screen bg-white">
+        <div className="flex flex-col sm:flex-row-reverse w-full min-h-screen justify-around bg-white">
             {showSideMenu ? (
-                <div
-                    className={`w-full flex flex-col items-center bg-pink-100 relative justify-between sm:hidden ${
-                        rowCount === 6 ? "six-rows" : "five-rows"
-                    }`}
-                >
+                <div className={`w-full flex flex-col items-center bg-pink-100 relative sm:hidden ${rowCount === 6 ? "six-rows" : "five-rows"}`}>
+                    <div className="flex flex-col items-center sm:mb-164 text-pink-400">
+                        <h1 className="text-2xl font-bold mt-8">おかしにっき</h1>
+                        <p className="text-xl my-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <button onClick={() => setShowSideMenu(false)} className="bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">
+                            かれんだー
+                        </button>
+                    </div>
                     <div className="w-full">
-                        <div className="flex flex-col items-center sm:mb-164 text-pink-400">
-                            <h1 className="text-2xl font-bold mt-8">おかしにっき</h1>
-                            <p className="text-xl my-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <button onClick={() => setShowSideMenu(false)} className="bg-pink-300 text-white rounded px-4 py-1 mt-2 mb-4">
-                                かれんだー
-                            </button>
-                        </div>
                         <div className="flex flex-row-reverse items-end">
                             <img src={candyImg} alt="Candy" className={`w-10 sm:w-40 candyImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                         </div>
-                        <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
+                        <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded sm:my-12 py-8">
                             <p className="text-3xl mb-12">今月のもくひょう！</p>
                             <div className="w-full mb-6">
                                 <p className="text-xl mr-4 whitespace-nowrap">かかく</p>
@@ -363,11 +359,12 @@ const Calendar = () => {
                                 <p className="text-xs text-red-500">※月に1回しかへんしゅうできないからちゅうい！</p>
                             </div>
                         </div>
-                        <div className="flex flex-row justify-between">
-                            <img src={cakeImg} alt="Cupcake" className={`mt-4 sm:w-10 cakeImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
-                            <img src={ameImg} alt="Ame" className={`mt-4 sm:w-10 ameImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
-                        </div>
                     </div>
+                    <div className="flex flex-row justify-between">
+                        <img src={cakeImg} alt="Cupcake" className={`mt-4 sm:w-10 cakeImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
+                        <img src={ameImg} alt="Ame" className={`mt-4 sm:w-10 ameImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
+                    </div>
+
                     <div className="flex flex-row justify-around w-full">
                         <div className="flex flex-col-reverse">
                             <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 mb-4 pb-8">
@@ -454,60 +451,63 @@ const Calendar = () => {
                         <h1 className="sm:text-2xl lg:text-3xl font-bold mt-8">おかしにっき</h1>
                         <p className="text-2xl sm:text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                     </div>
-                    <div className="flex flex-row items-end">
-                        <img src={candyImg} alt="Candy" className={`w-10 sm:w-28 candyImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
-                    </div>
-                    <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
-                        <p className="text-3xl sm:text-xl mb-12">今月のもくひょう！</p>
-                        <div className="w-full mb-6">
-                            <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かかく</p>
-                            <div className="flex items-center">
-                                <p className="text-lg sm:text-sm">{totalData.totalPrice} 円</p>
-                                <span className="mx-2">/</span>
-                                {isEditing ? (
-                                    <input
-                                        type="number"
-                                        name="priceGoal"
-                                        value={goalData.priceGoal}
-                                        onChange={handleGoalInputChange}
-                                        className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
-                                        placeholder="目標かかく"
-                                    />
-                                ) : (
-                                    <p className="text-lg sm:text-sm">{goalData.priceGoal} 円</p>
-                                )}
-                            </div>
+                    <div className="w-full py-12"></div>
+                    <div>
+                        <div className="flex flex-row items-end">
+                            <img src={candyImg} alt="Candy" className={`w-10 sm:w-28 candyImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                         </div>
-                        <div className="w-full mb-6">
-                            <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かろりー</p>
-                            <div className="flex items-center">
-                                <p className="text-lg sm:text-sm">{totalData.totalCalorie} kcal</p>
-                                <span className="mx-2">/</span>
-                                {isEditing ? (
-                                    <input
-                                        type="number"
-                                        name="calorieGoal"
-                                        value={goalData.calorieGoal}
-                                        onChange={handleGoalInputChange}
-                                        className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
-                                        placeholder="目標かろりー"
-                                    />
-                                ) : (
-                                    <p className="text-lg sm:text-sm">{goalData.calorieGoal} kcal</p>
-                                )}
+                        <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
+                            <p className="text-3xl sm:text-xl mb-12">今月のもくひょう！</p>
+                            <div className="w-full mb-6">
+                                <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かかく</p>
+                                <div className="flex items-center">
+                                    <p className="text-lg sm:text-sm">{totalData.totalPrice} 円</p>
+                                    <span className="mx-2">/</span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="priceGoal"
+                                            value={goalData.priceGoal}
+                                            onChange={handleGoalInputChange}
+                                            className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
+                                            placeholder="目標かかく"
+                                        />
+                                    ) : (
+                                        <p className="text-lg sm:text-sm">{goalData.priceGoal} 円</p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex flex-col items-center w-full">
-                            {isEditing ? (
-                                <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
-                                    ほぞん
-                                </button>
-                            ) : (
-                                <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
-                                    へんしゅう
-                                </button>
-                            )}
-                            <p className="text-xs text-red-500">※月に1回しかへんしゅうできないからちゅうい！</p>
+                            <div className="w-full mb-6">
+                                <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かろりー</p>
+                                <div className="flex items-center">
+                                    <p className="text-lg sm:text-sm">{totalData.totalCalorie} kcal</p>
+                                    <span className="mx-2">/</span>
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="calorieGoal"
+                                            value={goalData.calorieGoal}
+                                            onChange={handleGoalInputChange}
+                                            className="w-1/3 outline-none text-lg sm:text-sm border border-black rounded no-spin"
+                                            placeholder="目標かろりー"
+                                        />
+                                    ) : (
+                                        <p className="text-lg sm:text-sm">{goalData.calorieGoal} kcal</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center w-full">
+                                {isEditing ? (
+                                    <button onClick={handleGoalSave} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                        ほぞん
+                                    </button>
+                                ) : (
+                                    <button onClick={() => setIsEditing(true)} className="h-10 bg-pink-300 text-white rounded px-4 py-2 mb-4">
+                                        へんしゅう
+                                    </button>
+                                )}
+                                <p className="text-xs text-red-500">※月に1回しかへんしゅうできないからちゅうい！</p>
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
