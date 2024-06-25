@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "./firebase-config";
@@ -11,19 +11,23 @@ const Login = () => {
     useEffect(() => {
         if (userAgent.includes("line")) {
             alert("LINE内ブラウザではGoogleログインがサポートされていません。外部ブラウザで開いてください。");
+        } else {
+            getRedirectResult(auth)
+                .then((result) => {
+                    if (result) {
+                        console.log("ログイン成功:", result.user);
+                        navigate("/home");
+                    }
+                })
+                .catch((error) => {
+                    console.error("ログインエラー:", error);
+                });
         }
-    }, [userAgent]);
+    }, [userAgent, navigate]);
 
     const signInWithGoogle = () => {
         const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log("ログイン成功:", result.user);
-                navigate("/home");
-            })
-            .catch((error) => {
-                console.error("ログインエラー:", error);
-            });
+        signInWithRedirect(auth, provider);
     };
 
     return (
