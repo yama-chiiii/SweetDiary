@@ -16,6 +16,7 @@ const Login = () => {
                 auth.onAuthStateChanged((user) => {
                     if (user) {
                         console.log("ログイン成功:", user);
+                        localStorage.setItem("user", JSON.stringify(user)); // ローカルストレージに保存
                         navigate("/home");
                     } else {
                         console.log("ユーザーが見つかりません。");
@@ -42,6 +43,7 @@ const Login = () => {
         const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider).catch((error) => {
             console.error("ポップアップ中のエラー:", error);
+            alert("ログインに失敗しました。ポップアップブロッカーを確認してください。");
             setLoading(false);
         });
     };
@@ -50,7 +52,7 @@ const Login = () => {
         <div className="flex items-center justify-center min-h-screen bg-pink-100 font-sans">
             <div className="flex flex-col items-center justify-center bg-white w-full sm:w-3/4 lg:w-1/2 h-screen rounded-lg shadow-lg text-center">
                 {loading ? (
-                    <div className="loader">
+                    <div className="loader" style={{ color: "pink" }}>
                         <div className="wave"></div>
                         <div className="wave"></div>
                         <div className="wave"></div>
