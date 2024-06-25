@@ -14,7 +14,6 @@ const Login = () => {
                 const result = await getRedirectResult(auth);
                 if (result && result.user) {
                     console.log("ログイン成功:", result.user);
-                    sessionStorage.setItem("user", JSON.stringify(result.user));
                     navigate("/home");
                 } else {
                     console.log("リダイレクト結果が取得できませんでした。");
@@ -31,7 +30,9 @@ const Login = () => {
 
     const signInWithGoogle = () => {
         const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider);
+        signInWithRedirect(auth, provider).catch((error) => {
+            console.error("リダイレクト中のエラー:", error);
+        });
     };
 
     return (
