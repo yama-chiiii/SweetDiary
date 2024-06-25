@@ -2,69 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* styles.css */
 @media (min-width: 640px) {
-    .candyImg {
-        width: 5rem;
-        bottom: 0px;
-        right: 20px;
+    .five-rows.candyImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 520px;
+        right: 10px;
     }
-    .cakeImg {
-        width: 5rem;
-        bottom: 0px;
-        left: 20px;
+    .five-rows.cakeImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 180px;
+        left: -24px;
     }
-    .ameImg {
-        width: 5rem;
-        bottom: 0px;
-        right: 20px;
+    .five-rows.ameImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 180px;
+        right: 10px;
     }
-    .cakeDrinkImg {
-        width: 5rem;
-        bottom: 20px;
-        right: 30px;
-    }
-}
 
-/* デフォルトスタイルをここに記述 */
-.candyImg {
-    width: 2.5rem;
-    position: absolute;
-    bottom: 640px;
-    right: 10px;
-}
-.cakeImg {
-    width: 2.5rem;
-    position: absolute;
-    bottom: 280px;
-    left: -24px;
-}
-.ameImg {
-    width: 2.5rem;
-    position: absolute;
-    bottom: 280px;
-    right: 10px;
-}
-.cakeDrinkImg {
-    width: 2.5rem;
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
+    .six-rows.candyImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 640px;
+        right: 10px;
+    }
+    .six-rows.cakeImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 300px;
+        left: -24px;
+    }
+    .six-rows.ameImg {
+        width: 6rem;
+        position: absolute;
+        bottom: 300px;
+        right: 10px;
+    }
 }
 
 /* スマホサイズのスタイル */
 @media (max-width: 639px) {
     .candyImg {
+        position: absolute;
         width: 5rem;
-        bottom: 420px;
+        bottom: 400px;
         right: 10px;
     }
     .cakeImg {
+        position: absolute;
         width: 5rem;
         bottom: 36px;
         left: -10px;
     }
     .ameImg {
+        position: absolute;
         width: 6rem;
         bottom: 40px;
         right: 10px;

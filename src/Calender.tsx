@@ -28,7 +28,26 @@ const Calendar = () => {
     const [icons, setIcons] = useState<{ [key: string]: any }>({});
     const [isEditing, setIsEditing] = useState(false);
     const [showSideMenu, setShowSideMenu] = useState(false);
-    // const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
+
+    const calculateRowCount = () => {
+        const startDay = currentMonth.clone().startOf("month").startOf("week");
+        const endDay = currentMonth.clone().endOf("month").endOf("week");
+        const day = startDay.clone().subtract(1, "day");
+        let rowCount = 0;
+
+        while (day.isBefore(endDay, "day")) {
+            rowCount++;
+            day.add(1, "week");
+        }
+
+        return rowCount;
+    };
+
+    const [rowCount, setRowCount] = useState(calculateRowCount());
+
+    useEffect(() => {
+        setRowCount(calculateRowCount());
+    }, [currentMonth]);
 
     const [goalData, setGoalData] = useState<{
         priceGoal: string;
@@ -273,7 +292,11 @@ const Calendar = () => {
     return (
         <div className="flex flex-col sm:flex-row-reverse w-full min-h-screen bg-white">
             {showSideMenu ? (
-                <div className="w-full flex flex-col items-center bg-pink-100 relative justify-between sm:hidden">
+                <div
+                    className={`w-full flex flex-col items-center bg-pink-100 relative justify-between sm:hidden ${
+                        rowCount === 6 ? "six-rows" : "five-rows"
+                    }`}
+                >
                     <div className="w-full">
                         <div className="flex flex-col items-center sm:mb-164 text-pink-400">
                             <h1 className="text-2xl font-bold mt-8">おかしにっき</h1>
@@ -285,7 +308,7 @@ const Calendar = () => {
                             </button>
                         </div>
                         <div className="flex flex-row-reverse items-end">
-                            <img src={candyImg} alt="Candy" className="w-10 sm:w-40 candyImg" />
+                            <img src={candyImg} alt="Candy" className={`w-10 sm:w-40 candyImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                         </div>
                         <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
                             <p className="text-3xl mb-12">今月のもくひょう！</p>
@@ -341,8 +364,8 @@ const Calendar = () => {
                             </div>
                         </div>
                         <div className="flex flex-row justify-between">
-                            <img src={cakeImg} alt="Cupcake" className="mt-4 sm:w-10 cakeImg" />
-                            <img src={ameImg} alt="Ame" className="mt-4 sm:w-10 ameImg" />
+                            <img src={cakeImg} alt="Cupcake" className={`mt-4 sm:w-10 cakeImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
+                            <img src={ameImg} alt="Ame" className={`mt-4 sm:w-10 ameImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                         </div>
                     </div>
                     <div className="flex flex-row justify-around w-full">
@@ -421,14 +444,18 @@ const Calendar = () => {
                     </div>
                 </div>
             )}
-            <div className="hidden sm:flex sm:flex-col sm:w-1/4 sm:min-h-screen sm:bg-pink-100 sm:relative sm:justify-between">
+            <div
+                className={`hidden sm:flex sm:flex-col sm:w-1/4 sm:min-h-screen sm:bg-pink-100 sm:relative sm:justify-between ${
+                    rowCount === 6 ? "six-rows" : "five-rows"
+                }`}
+            >
                 <div className="w-full">
                     <div className="flex flex-col items-center mb-4 text-pink-400">
                         <h1 className="sm:text-2xl lg:text-3xl font-bold mt-8">おかしにっき</h1>
                         <p className="text-2xl sm:text-xl mt-8">やっほ〜 {user ? user.displayName : "ゲスト"}！</p>
                     </div>
                     <div className="flex flex-row items-end">
-                        <img src={candyImg} alt="Candy" className="w-10 sm:w-28 candyImg" />
+                        <img src={candyImg} alt="Candy" className={`w-10 sm:w-28 candyImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                     </div>
                     <div className="w-10/12 flex flex-col items-start justify-center mx-4 px-4 text-black bg-white rounded py-8">
                         <p className="text-3xl sm:text-xl mb-12">今月のもくひょう！</p>
@@ -484,8 +511,8 @@ const Calendar = () => {
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
-                        <img src={cakeImg} alt="Cupcake" className="w-10 sm:w-24 cakeImg" />
-                        <img src={ameImg} alt="Ame" className="w-10 sm:w-28 ameImg" />
+                        <img src={cakeImg} alt="Cupcake" className={`w-10 sm:w-24 cakeImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
+                        <img src={ameImg} alt="Ame" className={`w-10 sm:w-28 ameImg ${rowCount === 6 ? "six-rows" : "five-rows"}`} />
                     </div>
                 </div>
                 <div className="flex flex-row justify-around w-full">
@@ -498,6 +525,5 @@ const Calendar = () => {
         </div>
     );
 };
-
 
 export default Calendar;
