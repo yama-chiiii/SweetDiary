@@ -108,6 +108,9 @@ const Calendar = () => {
                         calorieGoal: data.calorieGoal || "",
                         lastEdited: data.lastEdited || null,
                     });
+                    if (data.lastEdited) {
+                        setIsEditing(false); // 編集モードを無効にする
+                    }
                 } else {
                     setGoalData({ priceGoal: "", calorieGoal: "", lastEdited: null });
                 }
@@ -215,6 +218,9 @@ const Calendar = () => {
                         calorieGoal: data.calorieGoal || "",
                         lastEdited: data.lastEdited, // このタイムスタンプを保存
                     });
+                    if (data.lastEdited) {
+                        setIsEditing(false); // 編集済みの場合、編集モードを無効にする
+                    }
                 } else {
                     setGoalData({ priceGoal: "", calorieGoal: "", lastEdited: null });
                 }
@@ -267,6 +273,7 @@ const Calendar = () => {
             );
             setIsEditing(false);
             alert("目標を保存しました。");
+            window.location.reload();
         } catch (error) {
             console.error("保存に失敗しました。エラーを確認してください。", error);
             alert("保存に失敗しました。エラーを確認してください。");
@@ -311,7 +318,9 @@ const Calendar = () => {
                             <div className="w-full mb-6">
                                 <p className="text-xl mr-4 whitespace-nowrap">かかく</p>
                                 <div className="flex items-center">
-                                    <p className="text-lg">{totalData.totalPrice} 円</p>
+                                    <p className={`text-lg ${totalData.totalPrice > parseFloat(goalData.priceGoal) ? "text-red-500" : ""}`}>
+                                        {totalData.totalPrice} 円
+                                    </p>
                                     <span className="mx-2">/</span>
                                     {isEditing ? (
                                         <input
@@ -330,7 +339,9 @@ const Calendar = () => {
                             <div className="w-full mb-6">
                                 <p className="text-xl mr-4 whitespace-nowrap">かろりー</p>
                                 <div className="flex items-center">
-                                    <p className="text-lg">{totalData.totalCalorie} kcal</p>
+                                    <p className={`text-lg ${totalData.totalCalorie > parseFloat(goalData.calorieGoal) ? "text-red-500" : ""}`}>
+                                        {totalData.totalCalorie} kcal
+                                    </p>
                                     <span className="mx-2">/</span>
                                     {isEditing ? (
                                         <input
@@ -461,7 +472,13 @@ const Calendar = () => {
                             <div className="w-full mb-6">
                                 <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かかく</p>
                                 <div className="flex items-center">
-                                    <p className="text-lg sm:text-sm">{totalData.totalPrice} 円</p>
+                                    <p
+                                        className={`text-lg sm:text-sm ${
+                                            totalData.totalPrice > parseFloat(goalData.priceGoal) ? "text-red-500" : ""
+                                        }`}
+                                    >
+                                        {totalData.totalPrice} 円
+                                    </p>
                                     <span className="mx-2">/</span>
                                     {isEditing ? (
                                         <input
@@ -480,7 +497,13 @@ const Calendar = () => {
                             <div className="w-full mb-6">
                                 <p className="text-xl sm:text-lg mr-4 whitespace-nowrap">かろりー</p>
                                 <div className="flex items-center">
-                                    <p className="text-lg sm:text-sm">{totalData.totalCalorie} kcal</p>
+                                    <p
+                                        className={`text-lg sm:text-sm ${
+                                            totalData.totalCalorie > parseFloat(goalData.calorieGoal) ? "text-red-500" : ""
+                                        }`}
+                                    >
+                                        {totalData.totalCalorie} kcal
+                                    </p>
                                     <span className="mx-2">/</span>
                                     {isEditing ? (
                                         <input
