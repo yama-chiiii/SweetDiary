@@ -539,7 +539,7 @@ const Calendar = () => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-around w-full">
-                    <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 pb-8 mb-12">
+                    <button onClick={handleLogout} className="h-1/3 bg-pink-300 text-white rounded px-4 py-2 pb-8 mb-8">
                         ログアウト
                     </button>
                     {/* <img src={cakeDrinkImg} alt="Cake and Drink" className="w-10 sm:w-40 cakeDrinkImg" /> */}
