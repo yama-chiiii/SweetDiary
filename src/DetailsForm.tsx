@@ -179,7 +179,7 @@ const DetailsForm = () => {
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className={`h-12 w-full px-4 sm:px-4 sm:mx-8 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
+                            className={`h-12 w-2/3 px-4 sm:px-4 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-lg sm:text-xl ${
                                 !isEditing ? "text-center" : ""
                             }`}
                             disabled={!isEditing}
@@ -190,7 +190,7 @@ const DetailsForm = () => {
                     <div className="flex flex-row items-center w-full px-4 sm:px-0">
                         <p className="py-4 text-lg sm:text-2xl">かろりー：</p>
                         <input
-                            type="number"
+                            type="tel"
                             id="cal"
                             name="cal"
                             value={formData.cal}
@@ -200,12 +200,12 @@ const DetailsForm = () => {
                             } no-spin`}
                             disabled={!isEditing}
                         />
-                        <p className="py-4 text-sm sm:text-lg">kcal</p>
+                        <p className="py-4  px-4 text-sm sm:text-lg">かろりー</p>
                     </div>
                     <div className="flex flex-row items-center w-full px-4 sm:px-0">
                         <p className="py-4 pl-2 sm:pl-6 text-lg sm:text-2xl">かかく：</p>
                         <input
-                            type="number"
+                            type="tel"
                             id="price"
                             name="price"
                             value={formData.price}
@@ -215,7 +215,7 @@ const DetailsForm = () => {
                             } no-spin`}
                             disabled={!isEditing}
                         />
-                        <p className="py-4 text-sm sm:text-lg">えん</p>
+                        <p className="py-4 px-4 text-sm sm:text-lg">えん</p>
                     </div>
                     <div className="flex flex-row items-center w-full px-4 sm:px-0">
                         <p className="py-4 text-lg sm:text-2xl">かんそう：</p>
