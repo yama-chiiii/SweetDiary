@@ -200,7 +200,7 @@ const DetailsForm = () => {
                             } no-spin`}
                             disabled={!isEditing}
                         />
-                        <p className="py-4  px-4 text-sm sm:text-lg">かろりー</p>
+                        <p className="py-4  px-4 text-sm sm:text-lg">きろかろりー</p>
                     </div>
                     <div className="flex flex-row items-center w-full px-4 sm:px-0">
                         <p className="py-4 pl-2 sm:pl-6 text-lg sm:text-2xl">かかく：</p>
